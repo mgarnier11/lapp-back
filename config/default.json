@@ -10,10 +10,7 @@
     "entity": "user",
     "service": "users",
     "secret": "5xfbPCOfBC40htfZg+RRHEp7Vag=",
-    "authStrategies": [
-      "jwt",
-      "local"
-    ],
+    "authStrategies": ["jwt", "local"],
     "jwtOptions": {
       "header": {
         "typ": "access"
@@ -28,5 +25,5 @@
       "passwordField": "password"
     }
   },
-  "mongodb": "mongodb://mgarnier:1Mo2Pa55e@ds235078.mlab.com:35078/lapp-db"
+  "mongodb": "DB"
 }

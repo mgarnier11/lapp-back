@@ -6,12 +6,13 @@ import axios from 'axios';
 import app from '../src/app';
 
 const port = app.get('port') || 8998;
-const getUrl = (pathname?: string) => url.format({
-  hostname: app.get('host') || 'localhost',
-  protocol: 'http',
-  port,
-  pathname
-});
+const getUrl = (pathname?: string) =>
+  url.format({
+    hostname: app.get('host') || 'localhost',
+    protocol: 'http',
+    port,
+    pathname
+  });
 
 describe('Feathers application tests', () => {
   let server: Server;
@@ -36,7 +37,7 @@ describe('Feathers application tests', () => {
       try {
         await axios.get(getUrl('path/to/nowhere'), {
           headers: {
-            'Accept': 'text/html'
+            Accept: 'text/html'
           }
         });
         assert.fail('should never get here');
@@ -57,6 +58,7 @@ describe('Feathers application tests', () => {
 
         assert.equal(response.status, 404);
         assert.equal(response.data.code, 404);
+
         assert.equal(response.data.message, 'Page not found');
         assert.equal(response.data.name, 'NotFound');
       }
