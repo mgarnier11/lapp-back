@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 export interface RoleModel {
-  id: ObjectId;
+  id?: ObjectId;
   name: string;
   iconUrl: string;
   permissionLevel: number;
@@ -52,7 +52,7 @@ export class Role {
    */
   constructor() {}
 
-  public static initFromDatas(datas: any): Role {
+  public static fromDatas(datas: any): Role {
     let r = new Role();
 
     r.id = datas._id;
@@ -61,5 +61,14 @@ export class Role {
     r.permissionLevel = datas.permissionLevel;
 
     return r;
+  }
+
+  public static toDatas(role: Role): RoleModel {
+    return {
+      id: role.id,
+      iconUrl: role.iconUrl,
+      name: role.name,
+      permissionLevel: role.permissionLevel
+    };
   }
 }
