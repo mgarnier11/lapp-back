@@ -4,8 +4,9 @@ import { Application } from '../../declarations';
 import { Role, RoleModel } from '../../classes/role.class';
 import { Params, Id, NullableId } from '@feathersjs/feathers';
 import { BadRequest } from '@feathersjs/errors';
+import app from '../../app';
 
-export class Roles extends Service {
+export class RoleServiceClass extends Service {
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
@@ -13,61 +14,73 @@ export class Roles extends Service {
 
     client.then(db => {
       this.Model = db.collection('roles');
+      this.test();
     });
   }
 
-  async remove(id: NullableId, params: Params): Promise<Role> {
-    let returnRole = Role.fromDatas(await super._remove(id, params));
+  async test() {
+    let r = await app.services.roles.create(
+      Role.New({
+        name: 'patate'
+      })
+    );
+    let t = await app.services.roles.find({ query: { name: 'test' } });
 
-    return returnRole;
+    console.log(t);
+    console.log(r);
   }
 
-  async create(datas: RoleModel, params?: Params) {
-    await super._create(datas, params);
-    let returnRole = Role.fromDatas(await super.create(datas, params));
+  async remove(id: NullableId, params?: Params): Promise<Role> {
+    let retValue = await Role.fromDatas(await this._remove(id, params));
 
-    return returnRole;
+    return retValue;
   }
 
-  async update(id: NullableId, role: Role, params?: Params): Promise<Role> {
-    let returnRole = Role.fromDatas(
-      await super._update(id, Role.toDatas(role), params)
+  async create(role: Role, params?: Params): Promise<Role> {
+    let retValue = await Role.fromDatas(
+      await this._create(await Role.toDatas(role), params)
     );
 
-    return returnRole;
+    return retValue;
   }
 
-  async patch(id: NullableId, role: Role, params?: Params): Promise<Role> {
-    let returnRole = Role.fromDatas(
-      await super._patch(id, Role.toDatas(role), params)
-    );
+  async get(id: Id, params?: Params) {
+    let retValue = await Role.fromDatas(await this._get(id, params));
 
-    return returnRole;
-  }
-
-  async get(id: Id, params?: Params): Promise<Role> {
-    let datas: any = await super._get(id, params);
-
-    let returnRole = Role.fromDatas(datas);
-
-    return returnRole;
+    return retValue;
   }
 
   async find(params?: Params): Promise<Role[]> {
-    let datasList: any = await super._find(params);
-    let returnRoles: Role[] = [];
+    let datasList: any = await this._find(params);
+    let retValue: Role[] = [];
 
     for (const datas of datasList) {
-      returnRoles.push(Role.fromDatas(datas));
+      retValue.push(await Role.fromDatas(datas));
     }
 
-    return returnRoles;
+    return retValue;
+  }
+
+  async update(id: NullableId, role: Role, params?: Params): Promise<Role> {
+    let retValue = await Role.fromDatas(
+      await this._update(id, await Role.toDatas(role), params)
+    );
+
+    return retValue;
+  }
+
+  async patch(id: NullableId, role: Role, params?: Params): Promise<Role> {
+    let retValue = await Role.fromDatas(
+      await this._patch(id, await Role.toDatas(role), params)
+    );
+
+    return retValue;
   }
 
   async getUserRole(): Promise<Role> {
-    let userRole: Role[] = await this.find({ name: 'user' });
+    let roles: Role[] = await this.find({ query: { name: 'user' } });
     try {
-      return userRole[0];
+      return roles[0];
     } catch (error) {
       throw new BadRequest(Role.Errors.UserRoleNotCreated);
     }

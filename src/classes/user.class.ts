@@ -1,21 +1,22 @@
-import { ObjectId } from 'mongodb';
 import { Role } from './role.class';
+import { NullableId, Id } from '@feathersjs/feathers';
+import app from '../app';
 
 export interface UserModel {
-  id?: ObjectId;
+  _id: NullableId;
   name: string;
   email: string;
   password: string;
-  roleId: ObjectId;
+  roleId: NullableId;
   gender: number;
 }
 
 export class User {
-  private _id: ObjectId = new ObjectId();
-  public get id(): ObjectId {
+  private _id: NullableId = null;
+  public get id(): NullableId {
     return this._id;
   }
-  public set id(value: ObjectId) {
+  public set id(value: NullableId) {
     this._id = value;
   }
 
@@ -63,4 +64,32 @@ export class User {
    *
    */
   constructor() {}
+
+  public static New(datas: Partial<User>): User {
+    return Object.assign({}, new User(), datas);
+  }
+
+  public static async fromDatas(datas: UserModel): Promise<User> {
+    let r = new User();
+
+    r.id = datas._id;
+    r.name = datas.name;
+    r.email = datas.email;
+    r.gender = datas.gender;
+    r.password = datas.password;
+    r.role = await app.services.roles.get(datas.roleId as Id);
+
+    return r;
+  }
+
+  public static async toDatas(user: User): Promise<UserModel> {
+    return {
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      gender: user.gender,
+      password: user.password,
+      roleId: user.role.id
+    };
+  }
 }

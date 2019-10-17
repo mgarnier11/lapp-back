@@ -56,6 +56,4 @@ app.use(express.errorHandler({ logger } as any));
 
 app.hooks(appHooks);
 
-app.services.roles.create({ name: 'test', permissionLevel: 0, iconUrl: '' });
-
 export default app;

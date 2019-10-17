@@ -1,9 +1,10 @@
-import { ObjectId } from 'mongodb';
+import { NullableId, HookContext } from '@feathersjs/feathers';
+import { plainToClass } from 'class-transformer';
 
 export interface RoleModel {
-  id?: ObjectId;
+  _id: NullableId;
   name: string;
-  iconUrl: string;
+  icon: string;
   permissionLevel: number;
 }
 
@@ -15,11 +16,11 @@ enum RoleErrors {
 export class Role {
   static readonly Errors = RoleErrors;
 
-  private _id: ObjectId = new ObjectId();
-  public get id(): ObjectId {
+  private _id: NullableId = null;
+  public get id(): NullableId {
     return this._id;
   }
-  public set id(value: ObjectId) {
+  public set id(value: NullableId) {
     this._id = value;
   }
 
@@ -31,12 +32,12 @@ export class Role {
     this._name = value;
   }
 
-  private _iconUrl: string = '';
-  public get iconUrl(): string {
-    return this._iconUrl;
+  private _icon: string = '';
+  public get icon(): string {
+    return this._icon;
   }
-  public set iconUrl(value: string) {
-    this._iconUrl = value;
+  public set icon(value: string) {
+    this._icon = value;
   }
 
   private _permissionLevel: number = 0;
@@ -52,23 +53,31 @@ export class Role {
    */
   constructor() {}
 
-  public static fromDatas(datas: any): Role {
+  public static New(datas: Partial<Role>): Role {
+    return Object.assign({}, new Role(), datas);
+  }
+
+  public static async fromDatas(datas: RoleModel): Promise<Role> {
     let r = new Role();
 
     r.id = datas._id;
     r.name = datas.name;
-    r.iconUrl = datas.iconUrl;
+    r.icon = datas.icon;
     r.permissionLevel = datas.permissionLevel;
 
     return r;
   }
 
-  public static toDatas(role: Role): RoleModel {
+  public static async toDatas(role: Role): Promise<RoleModel> {
     return {
-      id: role.id,
-      iconUrl: role.iconUrl,
+      _id: role.id,
+      icon: role.icon,
       name: role.name,
       permissionLevel: role.permissionLevel
     };
+  }
+
+  public static checkDatas(datas: any): boolean {
+    plainToClass(Role, datas);
   }
 }

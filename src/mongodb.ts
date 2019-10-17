@@ -13,6 +13,7 @@ export default function(app: Application) {
   })
     .then(client => {
       const dbName = parse(config, () => {});
+
       return client.db(dbName);
     })
     .catch(error => {

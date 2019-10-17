@@ -2,11 +2,11 @@ import { Db } from 'mongodb';
 import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
 import { Application } from '../../declarations';
 import { User, UserModel } from '../../classes/user.class';
-import { Params } from '@feathersjs/feathers';
+import { Params, NullableId, Id } from '@feathersjs/feathers';
 import app from '../../app';
 import { Role } from '../../classes/role.class';
 
-export class Users extends Service<User> {
+export class UserServiceClass extends Service {
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
@@ -17,18 +17,50 @@ export class Users extends Service<User> {
     });
   }
 
-  async create(data: User, params?: Params) {
-    const { name, email, password, gender } = data;
+  async remove(id: NullableId, params?: Params): Promise<User> {
+    let retValue = await User.fromDatas(await this._remove(id, params));
 
-    const userRole = await app.services.roles.getUserRole();
-    const userData: UserModel = {
-      email,
-      name,
-      password,
-      gender,
-      roleId: userRole.id
-    };
+    return retValue;
+  }
 
-    return super.create(userData, params);
+  async create(user: User, params?: Params): Promise<User> {
+    let retValue = await User.fromDatas(
+      await this._create(await User.toDatas(user), params)
+    );
+
+    return retValue;
+  }
+
+  async get(id: Id, params?: Params) {
+    let retValue = await User.fromDatas(await this._get(id, params));
+
+    return retValue;
+  }
+
+  async find(params?: Params): Promise<User[]> {
+    let datasList: any = await this._find(params);
+    let retValue: User[] = [];
+
+    for (const datas of datasList) {
+      retValue.push(await User.fromDatas(datas));
+    }
+
+    return retValue;
+  }
+
+  async update(id: NullableId, user: User, params?: Params): Promise<User> {
+    let retValue = await User.fromDatas(
+      await this._update(id, await User.toDatas(user), params)
+    );
+
+    return retValue;
+  }
+
+  async patch(id: NullableId, user: User, params?: Params): Promise<User> {
+    let retValue = await User.fromDatas(
+      await this._patch(id, await User.toDatas(user), params)
+    );
+
+    return retValue;
   }
 }
