@@ -12,52 +12,52 @@ export interface UserModel {
 }
 
 export class User {
-  private _id: NullableId = null;
+  private __id: NullableId = null;
   public get id(): NullableId {
-    return this._id;
+    return this.__id;
   }
   public set id(value: NullableId) {
-    this._id = value;
+    this.__id = value;
   }
 
-  private _name: string = '';
+  private __name: string = '';
   public get name(): string {
-    return this._name;
+    return this.__name;
   }
   public set name(value: string) {
-    this._name = value;
+    this.__name = value;
   }
 
-  private _email: string = '';
+  private __email: string = '';
   public get email(): string {
-    return this._email;
+    return this.__email;
   }
   public set email(value: string) {
-    this._email = value;
+    this.__email = value;
   }
 
-  private _password: string = '';
+  private __password: string = '';
   public get password(): string {
-    return this._password;
+    return this.__password;
   }
   public set password(value: string) {
-    this._password = value;
+    this.__password = value;
   }
 
-  private _role: Role = new Role();
+  private __role: Role = new Role();
   public get role(): Role {
-    return this._role;
+    return this.__role;
   }
   public set role(value: Role) {
-    this._role = value;
+    this.__role = value;
   }
 
-  private _gender: number = 0;
+  private __gender: number = 0;
   public get gender(): number {
-    return this._gender;
+    return this.__gender;
   }
   public set gender(value: number) {
-    this._gender = value;
+    this.__gender = value;
   }
 
   /**

@@ -10,42 +10,45 @@ export interface RoleModel {
 
 enum RoleErrors {
   NotFound = 'Role Not Found',
+  InvalidName = 'Invalid Name',
+  InvalidIcon = 'Invalid Icon',
+  InvalidPermissionLevel = 'Invalid PermissionLevel',
   UserRoleNotCreated = 'User role not created'
 }
 
 export class Role {
   static readonly Errors = RoleErrors;
 
-  private _id: NullableId = null;
+  private __id: NullableId = null;
   public get id(): NullableId {
-    return this._id;
+    return this.__id;
   }
   public set id(value: NullableId) {
-    this._id = value;
+    this.__id = value;
   }
 
-  private _name: string = '';
+  private __name: string = '';
   public get name(): string {
-    return this._name;
+    return this.__name;
   }
   public set name(value: string) {
-    this._name = value;
+    this.__name = value;
   }
 
-  private _icon: string = '';
+  private __icon: string = '';
   public get icon(): string {
-    return this._icon;
+    return this.__icon;
   }
   public set icon(value: string) {
-    this._icon = value;
+    this.__icon = value;
   }
 
-  private _permissionLevel: number = 0;
+  private __permissionLevel: number = 0;
   public get permissionLevel(): number {
-    return this._permissionLevel;
+    return this.__permissionLevel;
   }
   public set permissionLevel(value: number) {
-    this._permissionLevel = value;
+    this.__permissionLevel = value;
   }
 
   /**
@@ -75,9 +78,5 @@ export class Role {
       name: role.name,
       permissionLevel: role.permissionLevel
     };
-  }
-
-  public static checkDatas(datas: any): boolean {
-    plainToClass(Role, datas);
   }
 }

@@ -14,20 +14,7 @@ export class RoleServiceClass extends Service {
 
     client.then(db => {
       this.Model = db.collection('roles');
-      this.test();
     });
-  }
-
-  async test() {
-    let r = await app.services.roles.create(
-      Role.New({
-        name: 'patate'
-      })
-    );
-    let t = await app.services.roles.find({ query: { name: 'test' } });
-
-    console.log(t);
-    console.log(r);
   }
 
   async remove(id: NullableId, params?: Params): Promise<Role> {
