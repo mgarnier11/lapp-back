@@ -26,10 +26,9 @@
     "test": "npm run compile && npm run coverage",
     "dev": "ts-node-dev --no-notify src/",
     "start": "npm run compile && node lib/",
-    "coverage": "nyc --reporter=json > coverage/coverage.json npm run mocha && codecov",
+    "coverage": "nyc --reporter=json > coverage/coverage.json npm run mocha && codecov -F lapp-back",
     "mocha": "ts-mocha \"test/**/*.ts\" --recursive --exit",
-    "compile": "shx rm -rf lib/ && tsc",
-    "heroku-postbuild": "npm test"
+    "compile": "shx rm -rf lib/ && tsc"
   },
   "types": "lib/",
   "dependencies": {
