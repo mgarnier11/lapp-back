@@ -26,7 +26,7 @@
     "test": "npm run compile && npm run coverage",
     "dev": "ts-node-dev --no-notify src/",
     "start": "npm run compile && node lib/",
-    "coverage": "nyc --reporter=json > coverage/coverage.json npm run mocha",
+    "coverage": "nyc --reporter=json > coverage/coverage.json npm run mocha && codecov",
     "mocha": "ts-mocha \"test/**/*.ts\" --recursive --exit",
     "compile": "shx rm -rf lib/ && tsc"
   },
