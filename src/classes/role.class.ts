@@ -19,36 +19,36 @@ enum RoleErrors {
 export class Role {
   static readonly Errors = RoleErrors;
 
-  private __id: NullableId = null;
+  private _id: NullableId = null;
   public get id(): NullableId {
-    return this.__id;
+    return this._id;
   }
   public set id(value: NullableId) {
-    this.__id = value;
+    this._id = value;
   }
 
-  private __name: string = '';
+  private _name: string = '';
   public get name(): string {
-    return this.__name;
+    return this._name;
   }
   public set name(value: string) {
-    this.__name = value;
+    this._name = value;
   }
 
-  private __icon: string = '';
+  private _icon: string = '';
   public get icon(): string {
-    return this.__icon;
+    return this._icon;
   }
   public set icon(value: string) {
-    this.__icon = value;
+    this._icon = value;
   }
 
-  private __permissionLevel: number = 0;
+  private _permissionLevel: number = 0;
   public get permissionLevel(): number {
-    return this.__permissionLevel;
+    return this._permissionLevel;
   }
   public set permissionLevel(value: number) {
-    this.__permissionLevel = value;
+    this._permissionLevel = value;
   }
 
   /**

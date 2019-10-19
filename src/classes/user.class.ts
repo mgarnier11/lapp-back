@@ -12,52 +12,52 @@ export interface UserModel {
 }
 
 export class User {
-  private __id: NullableId = null;
+  private _id: NullableId = null;
   public get id(): NullableId {
-    return this.__id;
+    return this._id;
   }
   public set id(value: NullableId) {
-    this.__id = value;
+    this._id = value;
   }
 
-  private __name: string = '';
+  private _name: string = '';
   public get name(): string {
-    return this.__name;
+    return this._name;
   }
   public set name(value: string) {
-    this.__name = value;
+    this._name = value;
   }
 
-  private __email: string = '';
+  private _email: string = '';
   public get email(): string {
-    return this.__email;
+    return this._email;
   }
   public set email(value: string) {
-    this.__email = value;
+    this._email = value;
   }
 
-  private __password: string = '';
+  private _password: string = '';
   public get password(): string {
-    return this.__password;
+    return this._password;
   }
   public set password(value: string) {
-    this.__password = value;
+    this._password = value;
   }
 
-  private __role: Role = new Role();
+  private _role: Role = new Role();
   public get role(): Role {
-    return this.__role;
+    return this._role;
   }
   public set role(value: Role) {
-    this.__role = value;
+    this._role = value;
   }
 
-  private __gender: number = 0;
+  private _gender: number = 0;
   public get gender(): number {
-    return this.__gender;
+    return this._gender;
   }
   public set gender(value: number) {
-    this.__gender = value;
+    this._gender = value;
   }
 
   /**
@@ -77,7 +77,7 @@ export class User {
     r.email = datas.email;
     r.gender = datas.gender;
     r.password = datas.password;
-    r.role = await app.services.roles.get(datas.roleId as Id);
+    r.role = await app.services['roles'].get(datas.roleId as Id);
 
     return r;
   }
