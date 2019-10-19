@@ -1,5 +1,6 @@
 import logger from './logger';
 import app from './app';
+import { Game } from './classes/game.class';
 
 const port = app.get('port');
 const server = app.listen(port);

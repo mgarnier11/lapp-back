@@ -37,7 +37,7 @@ export class QuestionType {
   constructor() {}
 
   public static New(datas: Partial<QuestionType>): QuestionType {
-    return Object.assign({}, new QuestionType(), datas);
+    return Object.assign(new QuestionType(), datas);
   }
 
   public static async fromDatas(

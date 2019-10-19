@@ -66,7 +66,7 @@ export class User {
   constructor() {}
 
   public static New(datas: Partial<User>): User {
-    return Object.assign({}, new User(), datas);
+    return Object.assign(new User(), datas);
   }
 
   public static async fromDatas(datas: UserModel): Promise<User> {
@@ -77,8 +77,12 @@ export class User {
     r.email = datas.email;
     r.gender = datas.gender;
     r.password = datas.password;
-    r.role = await app.services['roles'].get(datas.roleId as Id);
-
+    try {
+      r.role = await app.services['roles'].get(datas.roleId as Id);
+    } catch (error) {
+      if (error.code === 404) r.role = new Role();
+      else throw error;
+    }
     return r;
   }
 

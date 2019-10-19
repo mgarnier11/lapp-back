@@ -5,8 +5,11 @@ import { User, UserModel } from '../../classes/user.class';
 import { Params, NullableId, Id } from '@feathersjs/feathers';
 import app from '../../app';
 import { Role } from '../../classes/role.class';
+import { EventEmitter } from 'events';
 
 export class UserServiceClass extends Service {
+  public evtEmt: EventEmitter = new EventEmitter();
+
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
@@ -31,7 +34,7 @@ export class UserServiceClass extends Service {
     return retValue;
   }
 
-  async get(id: Id, params?: Params) {
+  async get(id: Id, params?: Params): Promise<User> {
     let retValue = await User.fromDatas(await this._get(id, params));
 
     return retValue;

@@ -57,7 +57,7 @@ export class Role {
   constructor() {}
 
   public static New(datas: Partial<Role>): Role {
-    return Object.assign({}, new Role(), datas);
+    return Object.assign(new Role(), datas);
   }
 
   public static async fromDatas(datas: RoleModel): Promise<Role> {

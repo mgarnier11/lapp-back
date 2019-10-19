@@ -3,15 +3,20 @@ import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
 import { Application } from '../../declarations';
 import { NullableId, Params, Id } from '@feathersjs/feathers';
 import { QuestionType } from '../../classes/questionType.class';
+import { EventEmitter } from 'events';
 
-export class QuestionTypes extends Service {
+export class QuestionTypeServiceClass extends Service {
+  public evtEmt: EventEmitter = new EventEmitter();
+
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
     const client: Promise<Db> = app.get('mongoClient');
 
     client.then(db => {
-      this.Model = db.collection('questionTypes');
+      this.Model = db.collection('question-types');
+
+      this.evtEmt.emit('ready');
     });
   }
 
@@ -32,7 +37,7 @@ export class QuestionTypes extends Service {
     return retValue;
   }
 
-  async get(id: Id, params?: Params) {
+  async get(id: Id, params?: Params): Promise<QuestionType> {
     let retValue = await QuestionType.fromDatas(await this._get(id, params));
 
     return retValue;

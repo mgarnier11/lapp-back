@@ -57,14 +57,19 @@ export class Question {
   constructor() {}
 
   public static New(datas: Partial<Question>): Question {
-    return Object.assign({}, new Question(), datas);
+    return Object.assign(new Question(), datas);
   }
 
   public static async fromDatas(datas: QuestionModel): Promise<Question> {
     let r = new Question();
 
     r.id = datas._id;
-    r.type = await app.services['question-types'].get(datas.typeId as Id);
+    try {
+      r.type = await app.services['question-types'].get(datas.typeId as Id);
+    } catch (error) {
+      if (error.code === 404) r.type = new QuestionType();
+      else throw error;
+    }
     r.text = datas.text;
     r.difficulty = datas.difficulty;
     r.hotLevel = datas.hotLevel;

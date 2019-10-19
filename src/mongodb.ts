@@ -14,6 +14,8 @@ export default function(app: Application) {
     .then(client => {
       const dbName = parse(config, () => {});
 
+      app.emit('ready');
+
       return client.db(dbName);
     })
     .catch(error => {

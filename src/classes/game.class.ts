@@ -103,7 +103,7 @@ export class Game {
   constructor() {}
 
   public static New(datas: Partial<Game>): Game {
-    return Object.assign({}, new Game(), datas);
+    return Object.assign(new Game(), datas);
   }
 
   public static async fromDatas(datas: GameModel): Promise<Game> {
@@ -122,17 +122,17 @@ export class Game {
     });
     r.maxDifficulty = datas.maxDifficulty;
     r.maxHotLevel = datas.maxHotLevel;
-    r.creator = await app.services['users'].get(datas.creatorId as Id);
+    try {
+      r.creator = await app.services['users'].get(datas.creatorId as Id);
+    } catch (error) {
+      if (error.code === 404) r.creator = new User();
+      else throw error;
+    }
 
     return r;
   }
 
   public static async toDatas(game: Game): Promise<GameModel> {
-    console.log(game.users);
-    console.log(game._users);
-
-    console.log(game);
-
     return {
       _id: game.id,
       displayId: game.displayId,

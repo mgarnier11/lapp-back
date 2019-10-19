@@ -20,7 +20,7 @@ export default (options = {}): Hook => {
         throw new BadRequest(Role.Errors.InvalidIcon);
       newData.icon = oldData.icon;
 
-      if (Validator.isEmpty(oldData.permissionLevel))
+      if (typeof oldData.permissionLevel !== 'number')
         throw new BadRequest(Role.Errors.InvalidPermissionLevel);
       newData.permissionLevel = oldData.permissionLevel;
     } else if (method === 'patch') {
@@ -37,7 +37,7 @@ export default (options = {}): Hook => {
       }
 
       if (oldData.permissionLevel !== undefined) {
-        if (Validator.isEmpty(oldData.permissionLevel))
+        if (typeof oldData.permissionLevel !== 'number')
           throw new BadRequest(Role.Errors.InvalidPermissionLevel);
         newData.permissionLevel = oldData.permissionLevel;
       }

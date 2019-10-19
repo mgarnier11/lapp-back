@@ -17,9 +17,21 @@ const getUrl = (pathname?: string) =>
 describe('Feathers application tests', () => {
   let server: Server;
 
-  before(function(done) {
-    server = app.listen(port);
-    server.once('listening', () => done());
+  before(() => {
+    return new Promise((res, rej) => {
+      let r: boolean = false;
+      server = app.listen(port);
+
+      app.once('ready', () => {
+        if (r) res();
+        else r = true;
+      });
+
+      server.once('listening', () => {
+        if (r) res();
+        else r = true;
+      });
+    });
   });
 
   after(function(done) {

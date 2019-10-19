@@ -5,8 +5,11 @@ import { Role, RoleModel } from '../../classes/role.class';
 import { Params, Id, NullableId } from '@feathersjs/feathers';
 import { BadRequest } from '@feathersjs/errors';
 import app from '../../app';
+import { EventEmitter } from 'events';
 
 export class RoleServiceClass extends Service {
+  public evtEmt: EventEmitter = new EventEmitter();
+
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
@@ -14,6 +17,8 @@ export class RoleServiceClass extends Service {
 
     client.then(db => {
       this.Model = db.collection('roles');
+
+      this.evtEmt.emit('ready');
     });
   }
 
@@ -31,7 +36,7 @@ export class RoleServiceClass extends Service {
     return retValue;
   }
 
-  async get(id: Id, params?: Params) {
+  async get(id: Id, params?: Params): Promise<Role> {
     let retValue = await Role.fromDatas(await this._get(id, params));
 
     return retValue;
