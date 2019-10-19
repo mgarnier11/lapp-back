@@ -23,10 +23,10 @@
     "npm": ">= 3.0.0"
   },
   "scripts": {
-    "test": "npm run compile && npm run coverage",
+    "test": "npm run compile && npm run mocha",
     "dev": "ts-node-dev --no-notify src/",
     "start": "npm run compile && node lib/",
-    "coverage": "nyc --reporter=json > coverage/coverage.json npm run mocha && codecov -F lapp-back",
+    "coverage": "nyc --reporter=json > coverage/coverage.json npm test && codecov -F lapp-back",
     "mocha": "ts-mocha \"test/**/*.ts\" --recursive --exit",
     "compile": "shx rm -rf lib/ && tsc"
   },
