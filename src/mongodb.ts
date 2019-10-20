@@ -2,7 +2,8 @@
 import { parseConnectionString as parse } from 'mongodb-core';
 import { MongoClient } from 'mongodb';
 import { Application } from './declarations';
-const logger = require('./logger');
+import logger from './logger';
+//const logger = require('./logger');
 
 export default function(app: Application) {
   const config = app.get('mongodb');
@@ -12,6 +13,9 @@ export default function(app: Application) {
   })
     .then(client => {
       const dbName = parse(config, () => {});
+
+      app.emit('ready');
+
       return client.db(dbName);
     })
     .catch(error => {
