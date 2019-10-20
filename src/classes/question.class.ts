@@ -10,7 +10,17 @@ export interface QuestionModel {
   hotLevel: number;
 }
 
+enum QuestionErrors {
+  NotFound = 'Question Not Found',
+  text = 'Invalid Text',
+  difficulty = 'Invalid Difficulty',
+  hotLevel = 'Invalid HotLevel',
+  typeId = 'Invalid TypeId'
+}
+
 export class Question {
+  static readonly Errors = QuestionErrors;
+
   private _id: NullableId = null;
   public get id(): NullableId {
     return this._id;

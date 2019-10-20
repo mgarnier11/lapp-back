@@ -1,11 +1,12 @@
 import * as authentication from '@feathersjs/authentication';
+import questionTypeValidateHook from '../../hooks/question-type.validate.hook';
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [ authenticate('jwt') ],
+    all: [authenticate('jwt'), questionTypeValidateHook()],
     find: [],
     get: [],
     create: [],

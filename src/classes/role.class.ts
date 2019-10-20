@@ -10,9 +10,9 @@ export interface RoleModel {
 
 enum RoleErrors {
   NotFound = 'Role Not Found',
-  InvalidName = 'Invalid Name',
-  InvalidIcon = 'Invalid Icon',
-  InvalidPermissionLevel = 'Invalid PermissionLevel',
+  name = 'Invalid Name',
+  icon = 'Invalid Icon',
+  permissionLevel = 'Invalid PermissionLevel',
   UserRoleNotCreated = 'User role not created'
 }
 

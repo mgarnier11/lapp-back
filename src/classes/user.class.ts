@@ -11,7 +11,18 @@ export interface UserModel {
   gender: number;
 }
 
+enum UserErrors {
+  NotFound = 'User Not Found',
+  name = 'Invalid Name',
+  email = 'Invalid Email',
+  password = 'Invalid Password',
+  roleId = 'Invalid RoleId',
+  gender = 'Invalid Gender'
+}
+
 export class User {
+  static readonly Errors = UserErrors;
+
   private _id: NullableId = null;
   public get id(): NullableId {
     return this._id;

@@ -16,7 +16,20 @@ export interface GameModel {
   creatorId: NullableId;
 }
 
+enum GameErrors {
+  NotFound = 'Game Not Found',
+  displayId = 'Invalid DisplayId',
+  name = 'Invalid Name',
+  nbTurns = 'Invalid NbTurns',
+  actualTurn = 'Invalid ActualTurn',
+  maxDifficulty = 'Invalid MaxDifficulty',
+  maxHotLevel = 'Invalid MaxHotLevel',
+  creatorId = 'Invalid CreatorId'
+}
+
 export class Game {
+  static readonly Errors = GameErrors;
+
   private _id: NullableId = null;
   public get id(): NullableId {
     return this._id;

@@ -8,8 +8,7 @@ export interface QuestionTypeModel {
 
 enum QuestionTypeErrors {
   NotFound = 'QuestionType Not Found',
-  InvalidName = 'Invalid Name',
-  UserQuestionTypeNotCreated = 'User questionType not created'
+  name = 'Invalid Name'
 }
 
 export class QuestionType {

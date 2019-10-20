@@ -3,6 +3,7 @@ import expect from 'expect';
 import app from '../../src/app';
 import { User } from '../../src/classes/user.class';
 import { UserServiceClass } from '../../src/services/users/users.class';
+import { Role } from '../../src/classes/role.class';
 
 describe("'users' service", async () => {
   let service: UserServiceClass;
@@ -22,7 +23,11 @@ describe("'users' service", async () => {
 
   it('created a user', async () => {
     user = User.New({
-      name: 'test'
+      name: 'test',
+      email: 'test@gmail.com',
+      password: 'patate',
+      gender: 1,
+      role: new Role()
     });
     user = await service.create(user);
 
