@@ -1,9 +1,9 @@
-import { Db } from 'mongodb';
-import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
-import { Application } from '../../declarations';
-import { NullableId, Params, Id } from '@feathersjs/feathers';
-import { Question } from '../../classes/question.class';
-import { EventEmitter } from 'events';
+import { Db } from "mongodb";
+import { Service, MongoDBServiceOptions } from "feathers-mongodb";
+import { Application } from "../../declarations";
+import { NullableId, Params, Id } from "@feathersjs/feathers";
+import { Question } from "../../classes/question.class";
+import { EventEmitter } from "events";
 
 export class QuestionServiceClass extends Service {
   public evtEmt: EventEmitter = new EventEmitter();
@@ -11,67 +11,53 @@ export class QuestionServiceClass extends Service {
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
-    const client: Promise<Db> = app.get('mongoClient');
+    const client: Promise<Db> = app.get("mongoClient");
 
     client.then(db => {
-      this.Model = db.collection('questions');
+      this.Model = db.collection("questions");
 
-      this.evtEmt.emit('ready');
+      this.evtEmt.emit("ready");
     });
   }
 
   async remove(id: NullableId, params?: Params): Promise<Question> {
-    let retValue = await Question.fromDatas(await this._remove(id, params));
+    let dbQuestion = await this._remove(id, params);
 
-    return retValue;
+    return Question.fromDbToClass(dbQuestion);
   }
 
-  async create(question: Question, params?: Params): Promise<Question> {
-    let retValue = await Question.fromDatas(
-      await this._create(await Question.toDatas(question), params)
-    );
+  async create(datas: any, params?: Params): Promise<Question> {
+    let dbQuestion = await this._create(datas, params);
 
-    return retValue;
+    return Question.fromDbToClass(dbQuestion);
   }
 
   async get(id: Id, params?: Params): Promise<Question> {
-    let retValue = await Question.fromDatas(await this._get(id, params));
+    let dbQuestion = await this._get(id, params);
 
-    return retValue;
+    return Question.fromDbToClass(dbQuestion);
   }
 
   async find(params?: Params): Promise<Question[]> {
-    let datasList: any = await this._find(params);
-    let retValue: Question[] = [];
+    let dbQuestions: any = await this._find(params);
+    let questions: Question[] = [];
 
-    for (const datas of datasList) {
-      retValue.push(await Question.fromDatas(datas));
+    for (const dbQuestion of dbQuestions) {
+      questions.push(await Question.fromDbToClass(dbQuestion));
     }
 
-    return retValue;
+    return questions;
   }
 
-  async update(
-    id: NullableId,
-    question: Question,
-    params?: Params
-  ): Promise<Question> {
-    let retValue = await Question.fromDatas(
-      await this._update(id, await Question.toDatas(question), params)
-    );
+  async update(id: NullableId, datas: any, params?: Params): Promise<Question> {
+    let dbQuestion = this._update(id, datas, params);
 
-    return retValue;
+    return Question.fromDbToClass(dbQuestion);
   }
 
-  async patch(
-    id: NullableId,
-    question: Question,
-    params?: Params
-  ): Promise<Question> {
-    let retValue = await Question.fromDatas(
-      await this._patch(id, await Question.toDatas(question), params)
-    );
+  async patch(id: NullableId, datas: any, params?: Params): Promise<Question> {
+    let dbQuestion = this._patch(id, datas, params);
 
-    return retValue;
+    return Question.fromDbToClass(dbQuestion);
   }
 }

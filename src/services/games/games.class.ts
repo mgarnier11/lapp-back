@@ -1,9 +1,10 @@
-import { Db } from 'mongodb';
-import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
-import { Application } from '../../declarations';
-import { NullableId, Params, Id } from '@feathersjs/feathers';
-import { Game } from '../../classes/game.class';
-import { EventEmitter } from 'events';
+import { Db } from "mongodb";
+import { Service, MongoDBServiceOptions } from "feathers-mongodb";
+import { Application } from "../../declarations";
+import { NullableId, Params, Id } from "@feathersjs/feathers";
+import { Game } from "../../classes/game.class";
+import { EventEmitter } from "events";
+import { BadRequest } from "@feathersjs/errors";
 
 export class GameServiceClass extends Service {
   public evtEmt: EventEmitter = new EventEmitter();
@@ -11,59 +12,51 @@ export class GameServiceClass extends Service {
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
-    const client: Promise<Db> = app.get('mongoClient');
+    const client: Promise<Db> = app.get("mongoClient");
 
     client.then(db => {
-      this.Model = db.collection('games');
+      this.Model = db.collection("games");
 
-      this.evtEmt.emit('ready');
+      this.evtEmt.emit("ready");
     });
   }
 
   async remove(id: NullableId, params?: Params): Promise<Game> {
-    let retValue = await Game.fromDatas(await this._remove(id, params));
+    let dbGame = await this._remove(id, params);
 
-    return retValue;
+    return Game.fromDbToClass(dbGame);
   }
 
-  async create(game: Game, params?: Params): Promise<Game> {
-    let retValue = await Game.fromDatas(
-      await this._create(await Game.toDatas(game), params)
-    );
+  async create(datas: any, params?: Params): Promise<Game> {
+    let dbGame = await this._create(datas, params);
 
-    return retValue;
+    return Game.fromDbToClass(dbGame);
   }
 
   async get(id: Id, params?: Params): Promise<Game> {
-    let retValue = await Game.fromDatas(await this._get(id, params));
+    let dbGame = await this._get(id, params);
 
-    return retValue;
+    return Game.fromDbToClass(dbGame);
   }
 
   async find(params?: Params): Promise<Game[]> {
-    let datasList: any = await this._find(params);
-    let retValue: Game[] = [];
+    let dbGames: any = await this._find(params);
+    let games: Game[] = [];
 
-    for (const datas of datasList) {
-      retValue.push(await Game.fromDatas(datas));
+    for (const dbGame of dbGames) {
+      games.push(await Game.fromDbToClass(dbGame));
     }
 
-    return retValue;
+    return games;
   }
 
-  async update(id: NullableId, game: Game, params?: Params): Promise<Game> {
-    let retValue = await Game.fromDatas(
-      await this._update(id, await Game.toDatas(game), params)
-    );
+  async update(id: NullableId, datas: any, params?: Params): Promise<Game> {
+    let dbGame = this._update(id, datas, params);
 
-    return retValue;
+    return Game.fromDbToClass(dbGame);
   }
 
-  async patch(id: NullableId, game: Game, params?: Params): Promise<Game> {
-    let retValue = await Game.fromDatas(
-      await this._patch(id, await Game.toDatas(game), params)
-    );
-
-    return retValue;
+  async patch(id: NullableId, datas: any, params?: Params): Promise<Game> {
+    throw new BadRequest("Patch method is not implemented");
   }
 }

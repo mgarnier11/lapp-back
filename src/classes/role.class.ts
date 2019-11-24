@@ -1,5 +1,5 @@
-import { NullableId, HookContext } from '@feathersjs/feathers';
-import { plainToClass } from 'class-transformer';
+import { NullableId, HookContext } from "@feathersjs/feathers";
+import { plainToClass } from "class-transformer";
 
 export interface RoleModel {
   _id: NullableId;
@@ -9,11 +9,11 @@ export interface RoleModel {
 }
 
 enum RoleErrors {
-  NotFound = 'Role Not Found',
-  name = 'Invalid Name',
-  icon = 'Invalid Icon',
-  permissionLevel = 'Invalid PermissionLevel',
-  UserRoleNotCreated = 'User role not created'
+  NotFound = "Role Not Found",
+  name = "Invalid Name",
+  icon = "Invalid Icon",
+  permissionLevel = "Invalid PermissionLevel",
+  UserRoleNotCreated = "User role not created"
 }
 
 export class Role {
@@ -27,7 +27,7 @@ export class Role {
     this._id = value;
   }
 
-  private _name: string = '';
+  private _name: string = "";
   public get name(): string {
     return this._name;
   }
@@ -35,7 +35,7 @@ export class Role {
     this._name = value;
   }
 
-  private _icon: string = '';
+  private _icon: string = "";
   public get icon(): string {
     return this._icon;
   }
@@ -60,7 +60,7 @@ export class Role {
     return Object.assign(new Role(), datas);
   }
 
-  public static async fromDatas(datas: RoleModel): Promise<Role> {
+  public static async fromDbToClass(datas: any): Promise<Role> {
     let r = new Role();
 
     r.id = datas._id;
@@ -71,12 +71,13 @@ export class Role {
     return r;
   }
 
-  public static async toDatas(role: Role): Promise<RoleModel> {
-    return {
-      _id: role.id,
-      icon: role.icon,
-      name: role.name,
-      permissionLevel: role.permissionLevel
+  public static fromFrontToDb(datas: any): Partial<RoleModel> {
+    let dbDatas: Partial<RoleModel> = {
+      icon: datas.icon,
+      name: datas.name,
+      permissionLevel: datas.permissionLevel
     };
+
+    return dbDatas;
   }
 }

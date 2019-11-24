@@ -1,33 +1,41 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
-import { Hook, HookContext } from '@feathersjs/feathers';
-import * as Helper from './hookHelpers';
-import { Question } from '../classes/question.class';
+import { Hook, HookContext } from "@feathersjs/feathers";
+import * as Validator from "validate.js";
+import { Question } from "../classes/question.class";
+import { BadRequest } from "@feathersjs/errors";
+import { ObjectID } from "bson";
 
 export default (options = {}): Hook => {
   return async (context: HookContext) => {
     const method = context.method;
     const oldData = context.data;
-    let newData: any = {};
 
-    if (!(oldData instanceof Question)) {
-      if (method === 'create' || method === 'update' || method === 'patch') {
-        newData.text = Helper.validateString(oldData, 'text', Question.Errors);
+    if (method === "create" || method === "update") {
+      /* check if present datas are valid*/
 
-        newData.typeId = Helper.validateId(oldData, 'typeId', Question.Errors);
-        newData.difficulty = Helper.validateNumber(
-          oldData,
-          'difficulty',
-          Question.Errors
-        );
-        newData.hotLevel = Helper.validateNumber(
-          oldData,
-          'hotLevel',
-          Question.Errors
-        );
+      if (!Validator.isString(oldData.text))
+        throw new BadRequest(Question.Errors.text);
 
-        context.data = newData;
+      if (!Validator.isInteger(oldData.difficulty))
+        throw new BadRequest(Question.Errors.difficulty);
+
+      if (!Validator.isInteger(oldData.hotLevel))
+        throw new BadRequest(Question.Errors.hotLevel);
+
+      if (oldData.type) {
+        if (!Validator.isObject(oldData.type))
+          throw new BadRequest(Question.Errors.type);
+      } else if (oldData.typeId) {
+        if (!ObjectID.isValid(oldData.roleId))
+          throw new BadRequest(Question.Errors.type);
+      } else {
+        throw new BadRequest(Question.Errors.type);
       }
+
+      let newData = Question.fromFrontToDb(oldData);
+
+      context.data = newData;
     }
 
     return context;

@@ -1,6 +1,6 @@
-import { Role } from './role.class';
-import { NullableId, Id } from '@feathersjs/feathers';
-import app from '../app';
+import { Role } from "./role.class";
+import { NullableId, Id } from "@feathersjs/feathers";
+import app from "../app";
 
 export interface UserModel {
   _id: NullableId;
@@ -12,12 +12,13 @@ export interface UserModel {
 }
 
 enum UserErrors {
-  NotFound = 'User Not Found',
-  name = 'Invalid Name',
-  email = 'Invalid Email',
-  password = 'Invalid Password',
-  roleId = 'Invalid RoleId',
-  gender = 'Invalid Gender'
+  NotFound = "User Not Found",
+  name = "Invalid Name",
+  email = "Invalid Email",
+  password = "Invalid Password",
+  role = "Invalid Role",
+  roleId = "Invalid RoleId",
+  gender = "Invalid Gender"
 }
 
 export class User {
@@ -31,7 +32,7 @@ export class User {
     this._id = value;
   }
 
-  private _name: string = '';
+  private _name: string = "";
   public get name(): string {
     return this._name;
   }
@@ -39,7 +40,7 @@ export class User {
     this._name = value;
   }
 
-  private _email: string = '';
+  private _email: string = "";
   public get email(): string {
     return this._email;
   }
@@ -47,7 +48,7 @@ export class User {
     this._email = value;
   }
 
-  private _password: string = '';
+  private _password: string = "";
   public get password(): string {
     return this._password;
   }
@@ -80,7 +81,7 @@ export class User {
     return Object.assign(new User(), datas);
   }
 
-  public static async fromDatas(datas: UserModel): Promise<User> {
+  public static async fromDbToClass(datas: any): Promise<User> {
     let r = new User();
 
     r.id = datas._id;
@@ -89,7 +90,7 @@ export class User {
     r.gender = datas.gender;
     r.password = datas.password;
     try {
-      r.role = await app.services['roles'].get(datas.roleId as Id);
+      r.role = await app.services["roles"].get(datas.roleId as Id);
     } catch (error) {
       if (error.code === 404) r.role = new Role();
       else throw error;
@@ -97,14 +98,17 @@ export class User {
     return r;
   }
 
-  public static async toDatas(user: User): Promise<UserModel> {
-    return {
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      gender: user.gender,
-      password: user.password,
-      roleId: user.role.id
+  public static fromFrontToDb(datas: any): Partial<UserModel> {
+    let dbDatas: Partial<UserModel> = {
+      name: datas.name,
+      email: datas.email,
+      password: datas.password,
+      gender: datas.gender
     };
+
+    if (datas.role) dbDatas.roleId = datas.role.id;
+    else if (datas.roleId) dbDatas.roleId = datas.roleId;
+
+    return dbDatas;
   }
 }

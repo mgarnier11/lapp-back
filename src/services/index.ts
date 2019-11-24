@@ -6,7 +6,7 @@ import questions from './questions/questions.service';
 import games from './games/games.service';
 // Don't remove this comment. It's needed to format import lines nicely.
 
-export default function (app: Application) {
+export default function(app: Application) {
   app.configure(users);
   app.configure(roles);
   app.configure(questionTypes);

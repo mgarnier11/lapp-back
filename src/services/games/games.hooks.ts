@@ -1,12 +1,12 @@
-import * as authentication from '@feathersjs/authentication';
-import gameValidateHook from '../../hooks/game.validate.hook';
+import * as authentication from "@feathersjs/authentication";
+import gameValidateHook from "../../hooks/game.validate.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [authenticate('jwt') /*, gameValidateHook()*/],
+    all: [/*authenticate('jwt')*/ gameValidateHook()],
     find: [],
     get: [],
     create: [],

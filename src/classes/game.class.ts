@@ -1,7 +1,7 @@
-import { NullableId, Id } from '@feathersjs/feathers';
-import app from '../app';
-import { QuestionType } from './questionType.class';
-import { User } from './user.class';
+import { NullableId, Id } from "@feathersjs/feathers";
+import app from "../app";
+import { QuestionType } from "./questionType.class";
+import { User } from "./user.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -17,14 +17,18 @@ export interface GameModel {
 }
 
 enum GameErrors {
-  NotFound = 'Game Not Found',
-  displayId = 'Invalid DisplayId',
-  name = 'Invalid Name',
-  nbTurns = 'Invalid NbTurns',
-  actualTurn = 'Invalid ActualTurn',
-  maxDifficulty = 'Invalid MaxDifficulty',
-  maxHotLevel = 'Invalid MaxHotLevel',
-  creatorId = 'Invalid CreatorId'
+  NotFound = "Game Not Found",
+  displayId = "Invalid DisplayId",
+  name = "Invalid Name",
+  nbTurns = "Invalid NbTurns",
+  actualTurn = "Invalid ActualTurn",
+  maxDifficulty = "Invalid MaxDifficulty",
+  maxHotLevel = "Invalid MaxHotLevel",
+  creator = "Invalid Creator",
+  users = "Invalid Users",
+  userIds = "Invalid UserIds",
+  questionTypes = "Invalid QuestionTypes",
+  questionTypesIds = "Invalid QuestionTypesIds"
 }
 
 export class Game {
@@ -38,7 +42,7 @@ export class Game {
     this._id = value;
   }
 
-  private _displayId: string = '';
+  private _displayId: string = "";
   public get displayId(): string {
     return this._displayId;
   }
@@ -46,7 +50,7 @@ export class Game {
     this._displayId = value;
   }
 
-  private _name: string = '';
+  private _name: string = "";
   public get name(): string {
     return this._name;
   }
@@ -119,24 +123,24 @@ export class Game {
     return Object.assign(new Game(), datas);
   }
 
-  public static async fromDatas(datas: GameModel): Promise<Game> {
+  public static async fromDbToClass(datas: any): Promise<Game> {
     let r = new Game();
 
     r.id = datas._id;
     r.displayId = datas.displayId;
     r.name = datas.name;
-    r.users = await app.services['users'].find({
+    r.users = await app.services.users.find({
       query: { _id: { $in: datas.userIds } }
     });
     r.nbTurns = datas.nbTurns;
     r.actualTurn = datas.actualTurn;
-    r.questionTypes = await app.services['question-types'].find({
+    r.questionTypes = await app.services["question-types"].find({
       query: { _id: { $in: datas.questionTypesIds } }
     });
     r.maxDifficulty = datas.maxDifficulty;
     r.maxHotLevel = datas.maxHotLevel;
     try {
-      r.creator = await app.services['users'].get(datas.creatorId as Id);
+      r.creator = await app.services["users"].get(datas.creatorId as Id);
     } catch (error) {
       if (error.code === 404) r.creator = new User();
       else throw error;
@@ -145,18 +149,25 @@ export class Game {
     return r;
   }
 
-  public static async toDatas(game: Game): Promise<GameModel> {
-    return {
-      _id: game.id,
-      displayId: game.displayId,
-      name: game.name,
-      userIds: game.users.map(u => u.id),
-      nbTurns: game.nbTurns,
-      actualTurn: game.actualTurn,
-      questionTypesIds: game.questionTypes.map(qt => qt.id),
-      maxDifficulty: game.maxDifficulty,
-      maxHotLevel: game.maxHotLevel,
-      creatorId: game.creator.id
+  public static fromFrontToDb(datas: any): Partial<GameModel> {
+    let dbDatas: Partial<GameModel> = {
+      displayId: datas.displayId,
+      name: datas.name,
+      nbTurns: datas.nbTurns,
+      actualTurn: datas.actualTurn,
+      maxDifficulty: datas.maxDifficulty,
+      maxHotLevel: datas.maxHotLevel,
+      creatorId: datas.creator.id
     };
+
+    if (datas.users) dbDatas.userIds = datas.users.map(u => u.id);
+    else if (datas.userIds) dbDatas.userIds = datas.userIds;
+
+    if (datas.questionTypes)
+      dbDatas.questionTypesIds = datas.questionTypes.map(qt => qt.id);
+    else if (datas.questionTypesIds)
+      dbDatas.questionTypesIds = datas.questionTypesIds;
+
+    return dbDatas;
   }
 }

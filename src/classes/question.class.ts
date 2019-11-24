@@ -1,6 +1,6 @@
-import { NullableId, Id } from '@feathersjs/feathers';
-import app from '../app';
-import { QuestionType } from './questionType.class';
+import { NullableId, Id } from "@feathersjs/feathers";
+import app from "../app";
+import { QuestionType } from "./questionType.class";
 
 export interface QuestionModel {
   _id: NullableId;
@@ -11,11 +11,12 @@ export interface QuestionModel {
 }
 
 enum QuestionErrors {
-  NotFound = 'Question Not Found',
-  text = 'Invalid Text',
-  difficulty = 'Invalid Difficulty',
-  hotLevel = 'Invalid HotLevel',
-  typeId = 'Invalid TypeId'
+  NotFound = "Question Not Found",
+  text = "Invalid Text",
+  difficulty = "Invalid Difficulty",
+  hotLevel = "Invalid HotLevel",
+  type = "Invalid Type",
+  typeId = "Invalid TypeId"
 }
 
 export class Question {
@@ -37,7 +38,7 @@ export class Question {
     this._type = value;
   }
 
-  private _text: string = '';
+  private _text: string = "";
   public get text(): string {
     return this._text;
   }
@@ -70,12 +71,12 @@ export class Question {
     return Object.assign(new Question(), datas);
   }
 
-  public static async fromDatas(datas: QuestionModel): Promise<Question> {
+  public static async fromDbToClass(datas: any): Promise<Question> {
     let r = new Question();
 
     r.id = datas._id;
     try {
-      r.type = await app.services['question-types'].get(datas.typeId as Id);
+      r.type = await app.services["question-types"].get(datas.typeId as Id);
     } catch (error) {
       if (error.code === 404) r.type = new QuestionType();
       else throw error;
@@ -87,13 +88,16 @@ export class Question {
     return r;
   }
 
-  public static async toDatas(question: Question): Promise<QuestionModel> {
-    return {
-      _id: question.id,
-      typeId: question.type.id,
-      text: question.text,
-      difficulty: question.difficulty,
-      hotLevel: question.hotLevel
+  public static fromFrontToDb(datas: any): Partial<QuestionModel> {
+    let dbDatas: Partial<QuestionModel> = {
+      difficulty: datas.difficulty,
+      hotLevel: datas.hotLevel,
+      text: datas.text
     };
+
+    if (datas.type) dbDatas.typeId = datas.type.id;
+    else if (datas.typeId) dbDatas.typeId = datas.typeId;
+
+    return dbDatas;
   }
 }

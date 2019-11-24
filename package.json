@@ -53,6 +53,7 @@
     "reflect-metadata": "^0.1.13",
     "serve-favicon": "^2.5.0",
     "shx": "^0.3.2",
+    "validate.js": "^0.13.1",
     "validator": "^11.1.0",
     "winston": "^3.2.1"
   },

@@ -1,5 +1,5 @@
-import { NullableId, HookContext } from '@feathersjs/feathers';
-import { plainToClass } from 'class-transformer';
+import { NullableId, HookContext } from "@feathersjs/feathers";
+import { plainToClass } from "class-transformer";
 
 export interface QuestionTypeModel {
   _id: NullableId;
@@ -7,8 +7,8 @@ export interface QuestionTypeModel {
 }
 
 enum QuestionTypeErrors {
-  NotFound = 'QuestionType Not Found',
-  name = 'Invalid Name'
+  NotFound = "QuestionType Not Found",
+  name = "Invalid Name"
 }
 
 export class QuestionType {
@@ -22,7 +22,7 @@ export class QuestionType {
     this._id = value;
   }
 
-  private _name: string = '';
+  private _name: string = "";
   public get name(): string {
     return this._name;
   }
@@ -39,9 +39,7 @@ export class QuestionType {
     return Object.assign(new QuestionType(), datas);
   }
 
-  public static async fromDatas(
-    datas: QuestionTypeModel
-  ): Promise<QuestionType> {
+  public static async fromDbToClass(datas: any): Promise<QuestionType> {
     let r = new QuestionType();
 
     r.id = datas._id;
@@ -50,12 +48,11 @@ export class QuestionType {
     return r;
   }
 
-  public static async toDatas(
-    questionType: QuestionType
-  ): Promise<QuestionTypeModel> {
-    return {
-      _id: questionType.id,
-      name: questionType.name
+  public static fromFrontToDb(datas: any): Partial<QuestionTypeModel> {
+    let dbDatas: Partial<QuestionTypeModel> = {
+      name: datas.name
     };
+
+    return dbDatas;
   }
 }
