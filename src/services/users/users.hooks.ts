@@ -1,6 +1,6 @@
 import * as feathersAuthentication from "@feathersjs/authentication";
 import * as local from "@feathersjs/authentication-local";
-import userValidateHook from "../../hooks/user.validate.hook";
+import userValidateHook from "../../hooks/validate/user.validate.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = feathersAuthentication.hooks;
@@ -25,7 +25,6 @@ export default {
     all: [
       // Make sure the password field is never sent to the client
       // Always must be the last hook
-      protect("_password"),
       protect("password")
     ],
     find: [],

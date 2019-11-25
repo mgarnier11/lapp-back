@@ -1,5 +1,5 @@
 import * as authentication from "@feathersjs/authentication";
-import gameValidateHook from "../../hooks/game.validate.hook";
+import gameValidateHook from "../../hooks/validate/game.validate.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
