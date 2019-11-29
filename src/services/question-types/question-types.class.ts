@@ -53,7 +53,7 @@ export class QuestionTypeServiceClass extends Service<QuestionType> {
     datas: any,
     params?: Params
   ): Promise<QuestionType> {
-    let dbQuestionType = this._update(id, datas, params);
+    let dbQuestionType = await this._update(id, datas, params);
 
     return QuestionType.fromDbToClass(dbQuestionType);
   }

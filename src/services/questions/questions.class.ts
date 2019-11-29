@@ -50,7 +50,7 @@ export class QuestionServiceClass extends Service<Question> {
   }
 
   async update(id: NullableId, datas: any, params?: Params): Promise<Question> {
-    let dbQuestion = this._update(id, datas, params);
+    let dbQuestion = await this._update(id, datas, params);
 
     return Question.fromDbToClass(dbQuestion);
   }

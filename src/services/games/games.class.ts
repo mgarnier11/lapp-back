@@ -51,7 +51,7 @@ export class GameServiceClass extends Service<Game> {
   }
 
   async update(id: NullableId, datas: any, params?: Params): Promise<Game> {
-    let dbGame = this._update(id, datas, params);
+    let dbGame = await this._update(id, datas, params);
 
     return Game.fromDbToClass(dbGame);
   }
