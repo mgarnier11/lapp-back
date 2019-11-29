@@ -26,19 +26,31 @@ export default (options = {}): Hook => {
     if (method === "create" || method === "update") {
       /* check if present datas are valid*/
 
-      if (!Validator.isString(oldData.name))
+      if (!Validator.isString(oldData.name) || Validator2.isEmpty(oldData.name))
         throw new BadRequest(User.Errors.name);
+
+      let presentNames = await context.app.service("users").find({
+        query: {
+          name: oldData.name
+        }
+      });
+      if (presentNames.length > 0) throw new BadRequest(User.Errors.name);
 
       if (
         !Validator.isString(oldData.email) ||
-        !Validator2.isEmail(oldData.email)
+        !Validator2.isEmail(oldData.email) ||
+        Validator2.isEmpty(oldData.email)
       )
         throw new BadRequest(User.Errors.email);
 
-      if (!Validator.isString(oldData.password))
-        throw new BadRequest(User.Errors.password);
+      let presentEmails = await context.app.service("users").find({
+        query: {
+          email: oldData.email
+        }
+      });
+      if (presentEmails.length > 0) throw new BadRequest(User.Errors.email);
 
-      if (!Validator.isString(oldData.password))
+      if (!Validator.isString(oldData.password) || oldData.password.length < 8)
         throw new BadRequest(User.Errors.password);
 
       if (!Validator.isInteger(oldData.gender))

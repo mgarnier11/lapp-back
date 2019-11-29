@@ -5,7 +5,7 @@ import { NullableId, Params, Id } from "@feathersjs/feathers";
 import { Question } from "../../classes/question.class";
 import { EventEmitter } from "events";
 
-export class QuestionServiceClass extends Service {
+export class QuestionServiceClass extends Service<Question> {
   public evtEmt: EventEmitter = new EventEmitter();
 
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {

@@ -7,7 +7,7 @@ import { BadRequest } from "@feathersjs/errors";
 import app from "../../app";
 import { EventEmitter } from "events";
 
-export class RoleServiceClass extends Service {
+export class RoleServiceClass extends Service<Role> {
   public evtEmt: EventEmitter = new EventEmitter();
 
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {

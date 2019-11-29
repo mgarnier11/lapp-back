@@ -6,7 +6,7 @@ import { Game } from "../../classes/game.class";
 import { EventEmitter } from "events";
 import { BadRequest } from "@feathersjs/errors";
 
-export class GameServiceClass extends Service {
+export class GameServiceClass extends Service<Game> {
   public evtEmt: EventEmitter = new EventEmitter();
 
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {

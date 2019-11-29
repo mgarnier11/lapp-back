@@ -7,7 +7,7 @@ import app from "../../app";
 import { Role } from "../../classes/role.class";
 import { EventEmitter } from "events";
 
-export class UserServiceClass extends Service {
+export class UserServiceClass extends Service<User> {
   public evtEmt: EventEmitter = new EventEmitter();
 
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
