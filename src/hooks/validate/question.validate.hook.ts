@@ -26,10 +26,18 @@ export default (options = {}): Hook => {
       if (!Validator.isString(oldData.text))
         throw new BadRequest(Question.Errors.text);
 
-      if (!Validator.isInteger(oldData.difficulty))
+      if (
+        !Validator.isInteger(oldData.difficulty) ||
+        oldData.difficulty < 1 ||
+        oldData.difficulty > 5
+      )
         throw new BadRequest(Question.Errors.difficulty);
 
-      if (!Validator.isInteger(oldData.hotLevel))
+      if (
+        !Validator.isInteger(oldData.hotLevel) ||
+        oldData.hotLevel < 1 ||
+        oldData.hotLevel > 5
+      )
         throw new BadRequest(Question.Errors.hotLevel);
 
       if (oldData.type) {
@@ -43,6 +51,8 @@ export default (options = {}): Hook => {
       }
 
       let newData = Question.fromFrontToDb(oldData);
+
+      newData.creatorId = context.params.user.id.toString();
 
       context.data = newData;
     }

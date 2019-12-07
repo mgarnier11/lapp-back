@@ -72,6 +72,12 @@ export class User {
     this._gender = value;
   }
 
+  /*
+  public toJSON(): object {
+    return JSON.parse(JSON.stringify(this));
+  }
+  */
+
   /**
    *
    */

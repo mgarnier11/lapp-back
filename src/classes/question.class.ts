@@ -1,6 +1,7 @@
 import { NullableId, Id } from "@feathersjs/feathers";
 import app from "../app";
 import { QuestionType } from "./questionType.class";
+import { User } from "./user.class";
 
 export interface QuestionModel {
   _id: NullableId;
@@ -8,6 +9,7 @@ export interface QuestionModel {
   text: string;
   difficulty: number;
   hotLevel: number;
+  creatorId: NullableId;
 }
 
 enum QuestionErrors {
@@ -62,6 +64,14 @@ export class Question {
     this._hotLevel = value;
   }
 
+  private _creator: User = new User();
+  public get creator(): User {
+    return this._creator;
+  }
+  public set creator(value: User) {
+    this._creator = value;
+  }
+
   /**
    *
    */
@@ -84,6 +94,12 @@ export class Question {
     r.text = datas.text;
     r.difficulty = datas.difficulty;
     r.hotLevel = datas.hotLevel;
+    try {
+      r.creator = await app.services["users"].get(datas.creatorId as Id);
+    } catch (error) {
+      if (error.code === 404) r.creator = new User();
+      else throw error;
+    }
 
     return r;
   }
