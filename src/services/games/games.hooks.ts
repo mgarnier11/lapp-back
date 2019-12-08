@@ -1,5 +1,6 @@
 import * as authentication from "@feathersjs/authentication";
 import gameValidateHook from "../../hooks/validate/game.validate.hook";
+import gameCheckRemoveHook from "../../hooks/checkRemove/game.checkRemove.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
@@ -12,7 +13,7 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [gameCheckRemoveHook()]
   },
 
   after: {

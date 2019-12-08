@@ -13,7 +13,8 @@ enum RoleErrors {
   name = "Invalid Name",
   icon = "Invalid Icon",
   permissionLevel = "Invalid PermissionLevel",
-  UserRoleNotCreated = "User role not created"
+  UserRoleNotCreated = "User role not created",
+  UsersAssigned = "Users are assigned to this role"
 }
 
 export class Role {
