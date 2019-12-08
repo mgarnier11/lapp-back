@@ -20,7 +20,7 @@ export default (options = {}): Hook => {
       }
     }
 
-    if (method === "create" || method === "update") {
+    if (method === "create" || method === "patch") {
       /* check if present datas are valid*/
 
       if (!Validator.isString(oldData.text))
@@ -52,7 +52,15 @@ export default (options = {}): Hook => {
 
       let newData = Question.fromFrontToDb(oldData);
 
-      newData.creatorId = context.params.user.id.toString();
+      if (method === "create") {
+        if (context.params.user)
+          newData.creatorId = context.params.user.id.toString();
+        newData.creationDate = new Date();
+      }
+
+      if (context.params.user)
+        newData.updaterId = context.params.user.id.toString();
+      newData.updateDate = new Date();
 
       context.data = newData;
     }

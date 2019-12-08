@@ -52,13 +52,15 @@ export class RoleServiceClass extends Service<Role> {
   }
 
   async update(id: NullableId, datas: any, params?: Params): Promise<Role> {
+    throw new BadRequest("Update method is not implemented");
+
     let dbRole = await this._update(id, datas, params);
 
     return Role.fromDbToClass(dbRole);
   }
 
   async patch(id: NullableId, datas: any, params?: Params): Promise<Role> {
-    let dbRole = this._patch(id, datas, params);
+    let dbRole = await this._patch(id, datas, params);
 
     return Role.fromDbToClass(dbRole);
   }

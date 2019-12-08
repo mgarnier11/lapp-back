@@ -51,12 +51,15 @@ export class GameServiceClass extends Service<Game> {
   }
 
   async update(id: NullableId, datas: any, params?: Params): Promise<Game> {
+    throw new BadRequest("Update method is not implemented");
     let dbGame = await this._update(id, datas, params);
 
     return Game.fromDbToClass(dbGame);
   }
 
   async patch(id: NullableId, datas: any, params?: Params): Promise<Game> {
-    throw new BadRequest("Patch method is not implemented");
+    let dbGame = await this._patch(id, datas, params);
+
+    return Game.fromDbToClass(dbGame);
   }
 }

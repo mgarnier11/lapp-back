@@ -10,6 +10,9 @@ export interface QuestionModel {
   difficulty: number;
   hotLevel: number;
   creatorId: NullableId;
+  creationDate: Date;
+  updaterId: NullableId;
+  updateDate: Date;
 }
 
 enum QuestionErrors {
@@ -72,6 +75,30 @@ export class Question {
     this._creator = value;
   }
 
+  private _creationDate: Date = new Date();
+  public get creationDate(): Date {
+    return this._creationDate;
+  }
+  public set creationDate(value: Date) {
+    this._creationDate = value;
+  }
+
+  private _updater: User = new User();
+  public get updater(): User {
+    return this._updater;
+  }
+  public set updater(value: User) {
+    this._updater = value;
+  }
+
+  private _updateDate: Date = new Date();
+  public get updateDate(): Date {
+    return this._updateDate;
+  }
+  public set updateDate(value: Date) {
+    this._updateDate = value;
+  }
+
   /**
    *
    */
@@ -94,12 +121,29 @@ export class Question {
     r.text = datas.text;
     r.difficulty = datas.difficulty;
     r.hotLevel = datas.hotLevel;
-    try {
-      r.creator = await app.services["users"].get(datas.creatorId as Id);
-    } catch (error) {
-      if (error.code === 404) r.creator = new User();
-      else throw error;
+    if (datas.creatorId) {
+      try {
+        r.creator = await app.services["users"].get(datas.creatorId as Id);
+      } catch (error) {
+        if (error.code === 404) r.creator = new User();
+        else throw error;
+      }
+    } else {
+      r.creator = new User();
     }
+    r.creationDate = datas.creationDate;
+
+    if (datas.updaterId) {
+      try {
+        r.updater = await app.services["users"].get(datas.updaterId as Id);
+      } catch (error) {
+        if (error.code === 404) r.updater = new User();
+        else throw error;
+      }
+    } else {
+      r.updater = new User();
+    }
+    r.updateDate = datas.updateDate;
 
     return r;
   }

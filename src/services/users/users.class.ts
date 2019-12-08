@@ -6,6 +6,7 @@ import { Params, NullableId, Id } from "@feathersjs/feathers";
 import app from "../../app";
 import { Role } from "../../classes/role.class";
 import { EventEmitter } from "events";
+import { BadRequest } from "@feathersjs/errors";
 
 export class UserServiceClass extends Service<User> {
   public evtEmt: EventEmitter = new EventEmitter();
@@ -50,13 +51,15 @@ export class UserServiceClass extends Service<User> {
   }
 
   async update(id: NullableId, datas: any, params?: Params): Promise<User> {
+    throw new BadRequest("Update method is not implemented");
+
     let dbUser = await this._update(id, datas, params);
 
     return User.fromDbToClass(dbUser);
   }
 
   async patch(id: NullableId, datas: any, params?: Params): Promise<User> {
-    let dbUser = this._patch(id, datas, params);
+    let dbUser = await this._patch(id, datas, params);
 
     return User.fromDbToClass(dbUser);
   }

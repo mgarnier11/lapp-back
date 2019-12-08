@@ -23,7 +23,7 @@ export default (options = {}): Hook => {
       }
     }
 
-    if (method === "create" || method === "update") {
+    if (method === "create" || method === "patch") {
       /* check if present datas are valid*/
 
       if (!Validator.isString(oldData.name) || Validator2.isEmpty(oldData.name))

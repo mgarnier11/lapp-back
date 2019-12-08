@@ -19,7 +19,7 @@ export default (options = {}): Hook => {
         query._id.$in = query._id.$in.map(id => new ObjectID(id));
       }
     }
-    if (method === "create" || method === "update") {
+    if (method === "create" || method === "patch") {
       /* check if present datas are valid*/
 
       if (!Validator.isString(oldData.icon))

@@ -4,6 +4,7 @@ import { Application } from "../../declarations";
 import { NullableId, Params, Id } from "@feathersjs/feathers";
 import { Question } from "../../classes/question.class";
 import { EventEmitter } from "events";
+import { BadRequest } from "@feathersjs/errors";
 
 export class QuestionServiceClass extends Service<Question> {
   public evtEmt: EventEmitter = new EventEmitter();
@@ -50,13 +51,15 @@ export class QuestionServiceClass extends Service<Question> {
   }
 
   async update(id: NullableId, datas: any, params?: Params): Promise<Question> {
+    throw new BadRequest("Update method is not implemented");
+
     let dbQuestion = await this._update(id, datas, params);
 
     return Question.fromDbToClass(dbQuestion);
   }
 
   async patch(id: NullableId, datas: any, params?: Params): Promise<Question> {
-    let dbQuestion = this._patch(id, datas, params);
+    let dbQuestion = await this._patch(id, datas, params);
 
     return Question.fromDbToClass(dbQuestion);
   }

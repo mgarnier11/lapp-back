@@ -4,6 +4,7 @@ import { Application } from "../../declarations";
 import { NullableId, Params, Id } from "@feathersjs/feathers";
 import { QuestionType } from "../../classes/questionType.class";
 import { EventEmitter } from "events";
+import { BadRequest } from "@feathersjs/errors";
 
 export class QuestionTypeServiceClass extends Service<QuestionType> {
   public evtEmt: EventEmitter = new EventEmitter();
@@ -53,6 +54,7 @@ export class QuestionTypeServiceClass extends Service<QuestionType> {
     datas: any,
     params?: Params
   ): Promise<QuestionType> {
+    throw new BadRequest("Update method is not implemented");
     let dbQuestionType = await this._update(id, datas, params);
 
     return QuestionType.fromDbToClass(dbQuestionType);
@@ -63,7 +65,7 @@ export class QuestionTypeServiceClass extends Service<QuestionType> {
     datas: any,
     params?: Params
   ): Promise<QuestionType> {
-    let dbQuestionType = this._patch(id, datas, params);
+    let dbQuestionType = await this._patch(id, datas, params);
 
     return QuestionType.fromDbToClass(dbQuestionType);
   }
