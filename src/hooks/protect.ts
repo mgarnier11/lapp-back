@@ -1,11 +1,14 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { Hook, HookContext } from "@feathersjs/feathers";
+import { clone } from "lodash";
 
 export default (...fields: string[]): Hook => {
   return async (context: HookContext) => {
     const result = context.dispatch || context.result;
-    const o = data => {
+    const o = oldData => {
+      let data = clone(oldData);
+
       for (const f of fields) {
         let fIsGetter = Object.getOwnPropertyDescriptor(data, f) === undefined;
 
