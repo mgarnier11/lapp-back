@@ -1,8 +1,9 @@
 import * as feathersAuthentication from "@feathersjs/authentication";
 import * as local from "@feathersjs/authentication-local";
 import userValidateHook from "../../hooks/validate/user.validate.hook";
-import protectHook from "../../hooks/protect";
+import protectHook from "../../hooks/protect.hook";
 import userCheckRemoveHook from "../../hooks/checkRemove/user.checkRemove.hook";
+import checkUserHook from "../../hooks/checkUser.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = feathersAuthentication.hooks;
@@ -14,9 +15,9 @@ export default {
     find: [authenticate("jwt")],
     get: [authenticate("jwt")],
     create: [hashPassword("password")],
-    update: [hashPassword("password"), authenticate("jwt")],
-    patch: [hashPassword("password"), authenticate("jwt")],
-    remove: [authenticate("jwt"), userCheckRemoveHook()]
+    update: [hashPassword("password"), authenticate("jwt"), checkUserHook()],
+    patch: [hashPassword("password"), authenticate("jwt"), checkUserHook()],
+    remove: [authenticate("jwt"), checkUserHook(), userCheckRemoveHook()]
   },
 
   after: {

@@ -62,10 +62,23 @@ export default (options = {}): Hook => {
       if (!Validator.isInteger(oldData.maxHotLevel))
         throw new BadRequest(Game.Errors.maxHotLevel);
 
-      if (!Validator.isObject(oldData.creator))
-        throw new BadRequest(Game.Errors.creator);
+      if (oldData.type) {
+        if (!Validator.isObject(oldData.type))
+          throw new BadRequest(Game.Errors.type);
+      } else if (oldData.typeId) {
+        if (!Validator.isInteger(oldData.typeId))
+          throw new BadRequest(Game.Errors.type);
+      } else {
+        throw new BadRequest(Game.Errors.type);
+      }
 
       let newData = Game.fromFrontToDb(oldData);
+
+      if (method === "create") {
+        if (context.params.user)
+          newData.creatorId = context.params.user.id.toString();
+        newData.creationDate = new Date();
+      }
 
       context.data = newData;
     }

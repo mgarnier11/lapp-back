@@ -44,7 +44,7 @@ export default (options = {}): Hook => {
         if (!Validator.isObject(oldData.type))
           throw new BadRequest(Question.Errors.type);
       } else if (oldData.typeId) {
-        if (!ObjectID.isValid(oldData.roleId))
+        if (!ObjectID.isValid(oldData.typeId))
           throw new BadRequest(Question.Errors.type);
       } else {
         throw new BadRequest(Question.Errors.type);

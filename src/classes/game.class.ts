@@ -2,6 +2,7 @@ import { NullableId, Id } from "@feathersjs/feathers";
 import app from "../app";
 import { QuestionType } from "./questionType.class";
 import { User } from "./user.class";
+import { GameType } from "./gameType.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -14,6 +15,8 @@ export interface GameModel {
   maxDifficulty: number;
   maxHotLevel: number;
   creatorId: NullableId;
+  creationDate: Date;
+  typeId: string;
 }
 
 enum GameErrors {
@@ -28,7 +31,9 @@ enum GameErrors {
   users = "Invalid Users",
   userIds = "Invalid UserIds",
   questionTypes = "Invalid QuestionTypes",
-  questionTypesIds = "Invalid QuestionTypesIds"
+  questionTypesIds = "Invalid QuestionTypesIds",
+  type = "Invalid Type",
+  typeId = "Invalid TypeId"
 }
 
 export class Game {
@@ -114,6 +119,22 @@ export class Game {
     this._creator = value;
   }
 
+  private _creationDate: Date = new Date();
+  public get creationDate(): Date {
+    return this._creationDate;
+  }
+  public set creationDate(value: Date) {
+    this._creationDate = value;
+  }
+
+  private _type: GameType = new GameType();
+  public get type(): GameType {
+    return this._type;
+  }
+  public set type(value: GameType) {
+    this._type = value;
+  }
+
   /**
    *
    */
@@ -145,6 +166,14 @@ export class Game {
       if (error.code === 404) r.creator = new User();
       else throw error;
     }
+    r.creationDate = datas.creationDate;
+
+    try {
+      r.type = await app.services["game-types"].get(datas.typeId as string);
+    } catch (error) {
+      if (error.code === 404) r.creator = new User();
+      else throw error;
+    }
 
     return r;
   }
@@ -156,8 +185,7 @@ export class Game {
       nbTurns: datas.nbTurns,
       actualTurn: datas.actualTurn,
       maxDifficulty: datas.maxDifficulty,
-      maxHotLevel: datas.maxHotLevel,
-      creatorId: datas.creator.id
+      maxHotLevel: datas.maxHotLevel
     };
 
     if (datas.users) dbDatas.userIds = datas.users.map(u => u.id);
@@ -167,6 +195,9 @@ export class Game {
       dbDatas.questionTypesIds = datas.questionTypes.map(qt => qt.id);
     else if (datas.questionTypesIds)
       dbDatas.questionTypesIds = datas.questionTypesIds;
+
+    if (datas.type) dbDatas.typeId = datas.type.id;
+    else if (datas.typeId) dbDatas.typeId = datas.typeId;
 
     return dbDatas;
   }

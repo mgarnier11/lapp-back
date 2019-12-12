@@ -1,20 +1,24 @@
 import * as authentication from "@feathersjs/authentication";
 import questionValidateHook from "../../hooks/validate/question.validate.hook";
-import checkPermissions from "../../hooks/checkPermissions";
+import checkPermissions from "../../hooks/checkPermissions.hook";
 import questionCheckRemoveHook from "../../hooks/checkRemove/question.checkRemove.hook";
+import { adminPermissionLevel } from "../consts";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [/*authenticate("jwt"),*/ questionValidateHook()],
+    all: [authenticate("jwt"), questionValidateHook()],
     find: [],
     get: [],
     create: [],
     update: [],
     patch: [],
-    remove: [checkPermissions(100), questionCheckRemoveHook()]
+    remove: [
+      checkPermissions(adminPermissionLevel * 10),
+      questionCheckRemoveHook()
+    ]
   },
 
   after: {
