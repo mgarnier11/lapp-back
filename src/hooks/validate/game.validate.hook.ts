@@ -1,9 +1,9 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
-import { Hook, HookContext } from "@feathersjs/feathers";
+import { Hook, HookContext, Application } from "@feathersjs/feathers";
 import * as Helper from "../hookHelpers";
 import * as Validator from "validate.js";
-import { Game, GameModel } from "../../classes/game.class";
+import { Game, GameModel, GameStatus } from "../../classes/game.class";
 import { BadRequest } from "@feathersjs/errors";
 import { ObjectID } from "bson";
 
@@ -78,6 +78,8 @@ export default (options = {}): Hook => {
         if (context.params.user)
           newData.creatorId = context.params.user.id.toString();
         newData.creationDate = new Date();
+        newData.status = GameStatus.created;
+        newData.displayId = generateDisplayId(context.app);
       }
 
       context.data = newData;
@@ -86,3 +88,26 @@ export default (options = {}): Hook => {
     return context;
   };
 };
+
+function generateDisplayId(app: Application<{}>): string {
+  let displayId = makeid(5);
+
+  let existingGames = app.service("games").find({
+    query: {
+      displayId
+    }
+  });
+
+  if (existingGames.length > 0) return generateDisplayId(app);
+  else return displayId;
+}
+
+function makeid(length) {
+  var result = "";
+  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}

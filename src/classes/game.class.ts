@@ -17,6 +17,7 @@ export interface GameModel {
   creatorId: NullableId;
   creationDate: Date;
   typeId: string;
+  status: GameStatus;
 }
 
 enum GameErrors {
@@ -34,6 +35,12 @@ enum GameErrors {
   questionTypesIds = "Invalid QuestionTypesIds",
   type = "Invalid Type",
   typeId = "Invalid TypeId"
+}
+
+export enum GameStatus {
+  created = "Created",
+  started = "Started",
+  finished = "Finished"
 }
 
 export class Game {
@@ -135,6 +142,14 @@ export class Game {
     this._type = value;
   }
 
+  private _status: GameStatus = GameStatus.created;
+  public get status(): GameStatus {
+    return this._status;
+  }
+  public set status(value: GameStatus) {
+    this._status = value;
+  }
+
   /**
    *
    */
@@ -174,6 +189,7 @@ export class Game {
       if (error.code === 404) r.creator = new User();
       else throw error;
     }
+    r.status = datas.status;
 
     return r;
   }
