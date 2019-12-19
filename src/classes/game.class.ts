@@ -204,8 +204,10 @@ export class Game {
       maxHotLevel: datas.maxHotLevel
     };
 
-    if (datas.users) dbDatas.userIds = datas.users.map(u => u.id);
-    else if (datas.userIds) dbDatas.userIds = datas.userIds;
+    if (datas.users)
+      dbDatas.userIds = [...new Set<NullableId>(datas.users.map(u => u.id))];
+    else if (datas.userIds)
+      dbDatas.userIds = [...new Set<NullableId>(datas.userIds)];
 
     if (datas.questionTypes)
       dbDatas.questionTypesIds = datas.questionTypes.map(qt => qt.id);
