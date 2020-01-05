@@ -18,8 +18,6 @@ export default (options = {}): Hook => {
 
     context.params.query = query;
 
-    console.log(query);
-
     return context;
   };
 };

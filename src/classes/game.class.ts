@@ -3,6 +3,7 @@ import app from "../app";
 import { QuestionType } from "./questionType.class";
 import { User } from "./user.class";
 import { GameType } from "./gameType.class";
+import { DummyUser, DummyUserModel } from "./dummyUser.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -18,6 +19,7 @@ export interface GameModel {
   creationDate: Date;
   typeId: string;
   status: GameStatus;
+  dummyUsers: DummyUserModel[];
 }
 
 enum GameErrors {
@@ -76,6 +78,18 @@ export class Game {
   }
   public set users(value: User[]) {
     this._users = value;
+  }
+
+  public get allUsers(): (User | DummyUser)[] {
+    return [...this._users, ...this._dummyUsers];
+  }
+
+  private _dummyUsers: DummyUser[] = [];
+  public get dummyUsers(): DummyUser[] {
+    return this._dummyUsers;
+  }
+  public set dummyUsers(value: DummyUser[]) {
+    this._dummyUsers = value;
   }
 
   private _nbTurns: number = 0;
@@ -168,6 +182,12 @@ export class Game {
     r.users = await app.services.users.find({
       query: { _id: { $in: datas.userIds } }
     });
+
+    if (datas.dummyUsers)
+      for (const d of datas.dummyUsers) {
+        r.dummyUsers.push(await DummyUser.fromDbToClass(d));
+      }
+
     r.nbTurns = datas.nbTurns;
     r.actualTurn = datas.actualTurn;
     r.questionTypes = await app.services["question-types"].find({
@@ -190,6 +210,7 @@ export class Game {
       else throw error;
     }
     r.status = datas.status;
+    console.log(r);
 
     return r;
   }
@@ -203,6 +224,11 @@ export class Game {
       maxDifficulty: datas.maxDifficulty,
       maxHotLevel: datas.maxHotLevel
     };
+
+    if (datas.dummyUsers)
+      dbDatas.dummyUsers = datas.dummyUsers.map(d =>
+        DummyUser.fromFrontToDb(d)
+      );
 
     if (datas.users)
       dbDatas.userIds = [...new Set<NullableId>(datas.users.map(u => u.id))];
