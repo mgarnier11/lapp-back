@@ -72,6 +72,11 @@ export default (options = {}): Hook => {
         throw new BadRequest(Game.Errors.type);
       }
 
+      if (oldData.status) {
+        if (!Validator.isString(oldData.status))
+          throw new BadRequest(Game.Errors.status);
+      }
+
       let newData = Game.fromFrontToDb(oldData);
 
       if (method === "create") {

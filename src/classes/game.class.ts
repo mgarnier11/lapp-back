@@ -36,7 +36,8 @@ enum GameErrors {
   questionTypes = "Invalid QuestionTypes",
   questionTypesIds = "Invalid QuestionTypesIds",
   type = "Invalid Type",
-  typeId = "Invalid TypeId"
+  typeId = "Invalid TypeId",
+  status = "Invalid Status"
 }
 
 export enum GameStatus {
@@ -210,7 +211,6 @@ export class Game {
       else throw error;
     }
     r.status = datas.status;
-    console.log(r);
 
     return r;
   }
@@ -222,7 +222,8 @@ export class Game {
       nbTurns: datas.nbTurns,
       actualTurn: datas.actualTurn,
       maxDifficulty: datas.maxDifficulty,
-      maxHotLevel: datas.maxHotLevel
+      maxHotLevel: datas.maxHotLevel,
+      status: datas.status
     };
 
     if (datas.dummyUsers)

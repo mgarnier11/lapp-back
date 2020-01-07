@@ -49,7 +49,6 @@ describe("'users' service", async () => {
   it("update a user", async () => {
     user.name = "updated";
     let modifiedUser = await service.update(user.id, user);
-    console.log(modifiedUser);
 
     assert.equal(
       modifiedUser.name,

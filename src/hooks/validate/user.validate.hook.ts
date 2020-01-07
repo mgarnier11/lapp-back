@@ -4,6 +4,7 @@ import { Hook, HookContext } from "@feathersjs/feathers";
 import * as Validator from "validate.js";
 import * as Validator2 from "validator";
 import { User } from "../../classes/user.class";
+import { Role } from "../../classes/role.class";
 import { BadRequest } from "@feathersjs/errors";
 import { ObjectID, ObjectId } from "bson";
 
@@ -12,6 +13,7 @@ export default (options = {}): Hook => {
     const method = context.method;
     const oldData = context.data;
     const params = context.params;
+    const app = context.app;
 
     const { query = {} } = context.params;
 
@@ -56,17 +58,27 @@ export default (options = {}): Hook => {
       if (!Validator.isInteger(oldData.gender))
         throw new BadRequest(User.Errors.gender);
 
-      if (oldData.role) {
-        if (!Validator.isObject(oldData.role))
-          throw new BadRequest(User.Errors.role);
-      } else if (oldData.roleId) {
-        if (!ObjectID.isValid(oldData.roleId))
-          throw new BadRequest(User.Errors.roleId);
-      } else {
-        throw new BadRequest(User.Errors.role);
-      }
-
       let newData = User.fromFrontToDb(oldData);
+
+      if (method === "create") {
+        let userRoles = await app
+          .service("roles")
+          .find({ query: { name: "user" } });
+        let userRole = userRoles[0];
+
+        if (userRole) newData.roleId = userRole.id;
+        else throw new BadRequest(Role.Errors.UserRoleNotCreated);
+      } else {
+        if (oldData.role) {
+          if (!Validator.isObject(oldData.role))
+            throw new BadRequest(User.Errors.role);
+        } else if (oldData.roleId) {
+          if (!ObjectID.isValid(oldData.roleId))
+            throw new BadRequest(User.Errors.roleId);
+        } else {
+          throw new BadRequest(User.Errors.role);
+        }
+      }
 
       context.data = newData;
     }
