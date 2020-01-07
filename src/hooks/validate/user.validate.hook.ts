@@ -1,12 +1,13 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { Hook, HookContext } from "@feathersjs/feathers";
+import isUUID from "is-uuid";
 import * as Validator from "validate.js";
 import * as Validator2 from "validator";
 import { User } from "../../classes/user.class";
 import { Role } from "../../classes/role.class";
 import { BadRequest } from "@feathersjs/errors";
-import { ObjectID, ObjectId } from "bson";
+import { ObjectID } from "bson";
 
 export default (options = {}): Hook => {
   return async (context: HookContext) => {
@@ -43,7 +44,7 @@ export default (options = {}): Hook => {
         !Validator2.isEmail(oldData.email) ||
         Validator2.isEmpty(oldData.email)
       )
-        throw new BadRequest(User.Errors.email);
+        if (!isUUID.v1(oldData.email)) throw new BadRequest(User.Errors.email);
 
       let presentEmails = await context.app.service("users").find({
         query: {

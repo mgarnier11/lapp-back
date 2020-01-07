@@ -5,6 +5,10 @@ import protectHook from "../../hooks/protect.hook";
 import userCheckRemoveHook from "../../hooks/checkRemove/user.checkRemove.hook";
 import checkUserHook from "../../hooks/checkUser.hook";
 import searchRegex from "../../hooks/searchRegex.hook";
+import {
+  afterFindHook,
+  afterGetHook
+} from "../../hooks/users/protectIDViceUsers.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = feathersAuthentication.hooks;
@@ -27,8 +31,8 @@ export default {
       // Always must be the last hook
       protectHook("password")
     ],
-    find: [],
-    get: [],
+    find: [afterFindHook()],
+    get: [afterGetHook()],
     create: [],
     update: [],
     patch: [],

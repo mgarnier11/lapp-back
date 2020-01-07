@@ -18,6 +18,10 @@ export class UserServiceClass extends Service<User> {
 
     client.then(db => {
       this.Model = db.collection("users");
+
+      this.evtEmt.emit("ready");
+
+      console.log(this.events);
     });
   }
 

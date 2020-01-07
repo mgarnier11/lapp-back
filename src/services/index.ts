@@ -9,8 +9,8 @@ import gameTypes from "./game-types/game-types.service";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 export default function(app: Application) {
-  app.configure(users);
   app.configure(roles);
+  app.configure(users);
   app.configure(questionTypes);
   app.configure(questions);
   app.configure(games);
