@@ -8,7 +8,7 @@ import { Role } from "../../classes/role.class";
 import { EventEmitter } from "events";
 import { BadRequest } from "@feathersjs/errors";
 
-export const idViceName = "idViceN";
+export const idViceName = "ID-Vice ";
 
 export class UserServiceClass extends Service<User> {
   public evtEmt: EventEmitter = new EventEmitter();
