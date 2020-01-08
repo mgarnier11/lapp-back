@@ -1,5 +1,4 @@
-import { NullableId, HookContext } from "@feathersjs/feathers";
-import { plainToClass } from "class-transformer";
+import { NullableId } from "@feathersjs/feathers";
 
 export interface RoleModel {
   _id: NullableId;
