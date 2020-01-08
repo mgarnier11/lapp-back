@@ -7,7 +7,8 @@ import checkUserHook from "../../hooks/checkUser.hook";
 import searchRegex from "../../hooks/searchRegex.hook";
 import {
   afterFindHook,
-  afterGetHook
+  afterGetHook,
+  afterCreateHook
 } from "../../hooks/users/protectIDViceUsers.hook";
 // Don't remove this comment. It's needed to format import lines nicely.
 
@@ -32,8 +33,10 @@ export default {
       protectHook("password")
     ],
     find: [afterFindHook()],
-    get: [afterGetHook()],
-    create: [],
+    get: [
+      /*afterGetHook()*/
+    ],
+    create: [afterCreateHook()],
     update: [],
     patch: [],
     remove: []

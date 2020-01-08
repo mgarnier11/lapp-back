@@ -20,6 +20,15 @@ export const afterGetHook = (options = {}): Hook => {
   };
 };
 
+export const afterCreateHook = (options = {}): Hook => {
+  return async (context: HookContext) => {
+    if (context.params.password)
+      context.dispatch = {
+        ...context.result,
+        _password: context.params.password
+      };
+  };
+};
 function isIDVice(user: User): boolean {
   return isUUID.v1(user.email);
 }

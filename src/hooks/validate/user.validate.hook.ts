@@ -26,32 +26,53 @@ export default (options = {}): Hook => {
       }
     }
 
-    if (method === "create" || method === "patch") {
+    if (oldData && isUUID.v1(oldData.email)) {
+      if (method === "create") {
+        if (await context.app.service("users").isEmailPresent(oldData.email))
+          throw new BadRequest(User.Errors.email);
+
+        const name = await app.service("users").getNextIDViceName();
+        const password = User.generatePwd(oldData.email, name).toString();
+        const gender = -1;
+
+        let idViceUser = User.fromFrontToDb({
+          name,
+          email: oldData.email,
+          password,
+          gender
+        });
+
+        idViceUser.roleId = (
+          await context.app.service("roles").getUserRole()
+        ).id;
+
+        context.params.password = password;
+        context.data = idViceUser;
+      } else {
+        throw new BadRequest(User.Errors.idVice);
+      }
+    }
+
+    if (
+      (method === "create" || method === "patch") &&
+      !isUUID.v1(oldData.email)
+    ) {
       /* check if present datas are valid*/
 
-      if (!Validator.isString(oldData.name) || Validator2.isEmpty(oldData.name))
+      if (
+        !Validator.isString(oldData.name) ||
+        Validator2.isEmpty(oldData.name) ||
+        (await context.app.service("users").isNamePresent(oldData.name))
+      )
         throw new BadRequest(User.Errors.name);
-
-      let presentNames = await context.app.service("users").find({
-        query: {
-          name: oldData.name
-        }
-      });
-      if (presentNames.length > 0) throw new BadRequest(User.Errors.name);
 
       if (
         !Validator.isString(oldData.email) ||
         !Validator2.isEmail(oldData.email) ||
-        Validator2.isEmpty(oldData.email)
+        Validator2.isEmpty(oldData.email) ||
+        (await context.app.service("users").isEmailPresent(oldData.email))
       )
-        if (!isUUID.v1(oldData.email)) throw new BadRequest(User.Errors.email);
-
-      let presentEmails = await context.app.service("users").find({
-        query: {
-          email: oldData.email
-        }
-      });
-      if (presentEmails.length > 0) throw new BadRequest(User.Errors.email);
+        throw new BadRequest(User.Errors.email);
 
       if (!Validator.isString(oldData.password) || oldData.password.length < 8)
         throw new BadRequest(User.Errors.password);
@@ -62,13 +83,7 @@ export default (options = {}): Hook => {
       let newData = User.fromFrontToDb(oldData);
 
       if (method === "create") {
-        let userRoles = await app
-          .service("roles")
-          .find({ query: { name: "user" } });
-        let userRole = userRoles[0];
-
-        if (userRole) newData.roleId = userRole.id;
-        else throw new BadRequest(Role.Errors.UserRoleNotCreated);
+        newData.roleId = (await context.app.service("roles").getUserRole()).id;
       } else {
         if (oldData.role) {
           if (!Validator.isObject(oldData.role))

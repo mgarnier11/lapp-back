@@ -7,8 +7,15 @@ import { BadRequest } from "@feathersjs/errors";
 import app from "../../app";
 import { EventEmitter } from "events";
 
+let userRole = Role.New({
+  name: "user",
+  icon: "",
+  permissionLevel: 0
+});
+
 export class RoleServiceClass extends Service<Role> {
   public evtEmt: EventEmitter = new EventEmitter();
+  public static isLoaded: boolean = false;
 
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
@@ -19,6 +26,8 @@ export class RoleServiceClass extends Service<Role> {
       this.Model = db.collection("roles");
 
       this.evtEmt.emit("ready");
+
+      RoleServiceClass.isLoaded = true;
     });
   }
 
@@ -65,12 +74,25 @@ export class RoleServiceClass extends Service<Role> {
     return Role.fromDbToClass(dbRole);
   }
 
-  async getUserRole(): Promise<Role> {
-    let roles: Role[] = await this.find({ query: { name: "user" } });
-    try {
-      return roles[0];
-    } catch (error) {
-      throw new BadRequest(Role.Errors.UserRoleNotCreated);
-    }
+  public getUserRole(): Promise<Role> {
+    return new Promise((res, rej) => {
+      const roleServiceReady = () => {
+        this.find({ query: { name: userRole.name } }).then(async foundRoles => {
+          try {
+            userRole =
+              foundRoles.length === 0
+                ? await this.create(userRole)
+                : foundRoles[0];
+            res(userRole);
+          } catch (error) {
+            rej(error);
+          }
+        });
+      };
+
+      if (!RoleServiceClass.isLoaded)
+        this.evtEmt.once("ready", roleServiceReady);
+      else roleServiceReady();
+    });
   }
 }

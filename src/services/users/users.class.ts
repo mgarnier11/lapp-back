@@ -8,6 +8,8 @@ import { Role } from "../../classes/role.class";
 import { EventEmitter } from "events";
 import { BadRequest } from "@feathersjs/errors";
 
+export const idViceName = "idViceN";
+
 export class UserServiceClass extends Service<User> {
   public evtEmt: EventEmitter = new EventEmitter();
 
@@ -20,8 +22,6 @@ export class UserServiceClass extends Service<User> {
       this.Model = db.collection("users");
 
       this.evtEmt.emit("ready");
-
-      console.log(this.events);
     });
   }
 
@@ -66,5 +66,39 @@ export class UserServiceClass extends Service<User> {
     let dbUser = await this._patch(id, datas, params);
 
     return User.fromDbToClass(dbUser);
+  }
+
+  isEmailPresent(email: string): Promise<boolean> {
+    return new Promise((res, rej) => {
+      app.services.users
+        .find({ query: { email } })
+        .then(foundUsers => {
+          if (foundUsers.length > 0) res(true);
+          else res(false);
+        })
+        .catch(error => rej(error));
+    });
+  }
+
+  isNamePresent(name): Promise<boolean> {
+    return new Promise((res, rej) => {
+      app.services.users
+        .find({ query: { name } })
+        .then(foundUsers => {
+          if (foundUsers.length > 0) res(true);
+          else res(false);
+        })
+        .catch(error => rej(error));
+    });
+  }
+
+  getNextIDViceName(): Promise<string> {
+    return new Promise((res, rej) => {
+      app.services.users
+        .find({ query: { name: { $search: `${idViceName}\\d+$` } } })
+        .then(foundUsers => {
+          res(idViceName + foundUsers.length);
+        });
+    });
   }
 }

@@ -1,4 +1,7 @@
 import { Role } from "./role.class";
+import bcrypt from "bcryptjs";
+import { AES } from "crypto-ts";
+import uuidGenerator from "uuid";
 import { NullableId, Id } from "@feathersjs/feathers";
 import app from "../app";
 
@@ -18,7 +21,8 @@ enum UserErrors {
   password = "Invalid Password",
   role = "Invalid Role",
   roleId = "Invalid RoleId",
-  gender = "Invalid Gender"
+  gender = "Invalid Gender",
+  idVice = "Invalid method for ID-Vice"
 }
 
 export class User {
@@ -116,5 +120,15 @@ export class User {
     else if (datas.roleId) dbDatas.roleId = datas.roleId;
 
     return dbDatas;
+  }
+
+  public static generatePwd(uuid, userName) {
+    const secret = `${
+      process.env.NOT_LOGGED_SECRET
+    };${uuidGenerator.v1()};${userName}`;
+
+    let pwdKey = bcrypt.hashSync(secret, 10);
+
+    return AES.encrypt(uuid, pwdKey);
   }
 }

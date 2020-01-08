@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import bcrypt from "bcryptjs";
 import { ServiceAddons } from "@feathersjs/feathers";
 import { Application } from "../../declarations";
 import { UserServiceClass } from "./users.class";
@@ -18,7 +17,7 @@ export default function(app: Application) {
   const options = {
     paginate: false,
     whitelist: ["$regex"],
-    events: ["newNotLoggedPassword"]
+    events: []
   };
 
   // Initialize our service with any options it requires
@@ -28,16 +27,4 @@ export default function(app: Application) {
   const service = app.service("users");
 
   service.hooks(hooks);
-
-  service.on("newNotLoggedPassword", (uuid, userName, cb) => {
-    console.log("test");
-
-    const secret = process.env.NOT_LOGGED_SECRET;
-
-    let pwdSalt = bcrypt.hashSync(userName, secret);
-
-    let pwd = bcrypt.hashSync(uuid, pwdSalt);
-
-    cb(pwd);
-  });
 }
