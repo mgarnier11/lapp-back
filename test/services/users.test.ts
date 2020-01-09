@@ -1,9 +1,9 @@
-import assert from 'assert';
-import expect from 'expect';
-import app from '../../src/app';
-import { User } from '../../src/classes/user.class';
-import { UserServiceClass } from '../../src/services/users/users.class';
-import { Role } from '../../src/classes/role.class';
+import assert from "assert";
+import expect from "expect";
+import app from "../../src/app";
+import { User } from "../../src/classes/user.class";
+import { UserServiceClass } from "../../src/services/users/users.class";
+import { Role } from "../../src/classes/role.class";
 
 describe("'users' service", async () => {
   let service: UserServiceClass;
@@ -17,38 +17,39 @@ describe("'users' service", async () => {
     });
   });
 
-  it('initialized the service', () => {
-    assert.ok(service, 'Initialized the service');
+  it("initialized the service", () => {
+    assert.ok(service, "Initialized the service");
   });
 
-  it('created a user', async () => {
+  it("created a user", async () => {
     user = User.New({
-      name: 'test',
-      email: 'test@gmail.com',
-      password: 'patate',
+      name: "test",
+      email: "test@gmail.com",
+      password: "patate",
       gender: 1,
       role: new Role()
     });
     user = await service.create(user);
 
-    assert.equal(user.name, 'test', "Created a new 'test' user");
+    assert.equal(user.name, "test", "Created a new 'test' user");
   });
 
-  it('get a user', async () => {
+  it("get a user", async () => {
     let getUser = await service.get(user.id);
 
     assert.equal(getUser.name, user.name, "Got the created 'test' user");
   });
 
-  it('find a user', async () => {
+  it("find a user", async () => {
     let findUsers = await service.find({ query: { _id: user.id } });
 
     assert.equal(findUsers[0].name, user.name, "Found the created 'test' user");
   });
 
-  it('update a user', async () => {
-    user.name = 'updated';
+  it("update a user", async () => {
+    user.name = "updated";
     let modifiedUser = await service.update(user.id, user);
+
     assert.equal(
       modifiedUser.name,
       user.name,
@@ -56,18 +57,7 @@ describe("'users' service", async () => {
     );
   });
 
-  it('patch a user', async () => {
-    user.name = 'patched';
-    let patchedUser = await service.patch(user.id, user);
-
-    assert.equal(
-      patchedUser.name,
-      user.name,
-      "Modified the 'updated' user to 'patched'"
-    );
-  });
-
-  it('remove a user', async () => {
+  it("remove a user", async () => {
     let removedUser = await service.remove(user.id);
 
     assert.equal(

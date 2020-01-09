@@ -1,6 +1,7 @@
-import { NullableId, Id } from '@feathersjs/feathers';
-import app from '../app';
-import { QuestionType } from './questionType.class';
+import { NullableId, Id } from "@feathersjs/feathers";
+import app from "../app";
+import { QuestionType } from "./questionType.class";
+import { User } from "./user.class";
 
 export interface QuestionModel {
   _id: NullableId;
@@ -8,14 +9,19 @@ export interface QuestionModel {
   text: string;
   difficulty: number;
   hotLevel: number;
+  creatorId: NullableId;
+  creationDate: Date;
+  updaterId: NullableId;
+  updateDate: Date;
 }
 
 enum QuestionErrors {
-  NotFound = 'Question Not Found',
-  text = 'Invalid Text',
-  difficulty = 'Invalid Difficulty',
-  hotLevel = 'Invalid HotLevel',
-  typeId = 'Invalid TypeId'
+  NotFound = "Question Not Found",
+  text = "Invalid Text",
+  difficulty = "Invalid Difficulty",
+  hotLevel = "Invalid HotLevel",
+  type = "Invalid Type",
+  typeId = "Invalid TypeId"
 }
 
 export class Question {
@@ -37,7 +43,7 @@ export class Question {
     this._type = value;
   }
 
-  private _text: string = '';
+  private _text: string = "";
   public get text(): string {
     return this._text;
   }
@@ -61,6 +67,38 @@ export class Question {
     this._hotLevel = value;
   }
 
+  private _creator: User = new User();
+  public get creator(): User {
+    return this._creator;
+  }
+  public set creator(value: User) {
+    this._creator = value;
+  }
+
+  private _creationDate: Date = new Date();
+  public get creationDate(): Date {
+    return this._creationDate;
+  }
+  public set creationDate(value: Date) {
+    this._creationDate = value;
+  }
+
+  private _updater: User = new User();
+  public get updater(): User {
+    return this._updater;
+  }
+  public set updater(value: User) {
+    this._updater = value;
+  }
+
+  private _updateDate: Date = new Date();
+  public get updateDate(): Date {
+    return this._updateDate;
+  }
+  public set updateDate(value: Date) {
+    this._updateDate = value;
+  }
+
   /**
    *
    */
@@ -70,12 +108,12 @@ export class Question {
     return Object.assign(new Question(), datas);
   }
 
-  public static async fromDatas(datas: QuestionModel): Promise<Question> {
+  public static async fromDbToClass(datas: any): Promise<Question> {
     let r = new Question();
 
     r.id = datas._id;
     try {
-      r.type = await app.services['question-types'].get(datas.typeId as Id);
+      r.type = await app.services["question-types"].get(datas.typeId as Id);
     } catch (error) {
       if (error.code === 404) r.type = new QuestionType();
       else throw error;
@@ -83,17 +121,43 @@ export class Question {
     r.text = datas.text;
     r.difficulty = datas.difficulty;
     r.hotLevel = datas.hotLevel;
+    if (datas.creatorId) {
+      try {
+        r.creator = await app.services["users"].get(datas.creatorId as Id);
+      } catch (error) {
+        if (error.code === 404) r.creator = new User();
+        else throw error;
+      }
+    } else {
+      r.creator = new User();
+    }
+    r.creationDate = datas.creationDate;
+
+    if (datas.updaterId) {
+      try {
+        r.updater = await app.services["users"].get(datas.updaterId as Id);
+      } catch (error) {
+        if (error.code === 404) r.updater = new User();
+        else throw error;
+      }
+    } else {
+      r.updater = new User();
+    }
+    r.updateDate = datas.updateDate;
 
     return r;
   }
 
-  public static async toDatas(question: Question): Promise<QuestionModel> {
-    return {
-      _id: question.id,
-      typeId: question.type.id,
-      text: question.text,
-      difficulty: question.difficulty,
-      hotLevel: question.hotLevel
+  public static fromFrontToDb(datas: any): Partial<QuestionModel> {
+    let dbDatas: Partial<QuestionModel> = {
+      difficulty: datas.difficulty,
+      hotLevel: datas.hotLevel,
+      text: datas.text
     };
+
+    if (datas.type) dbDatas.typeId = datas.type.id;
+    else if (datas.typeId) dbDatas.typeId = datas.typeId;
+
+    return dbDatas;
   }
 }

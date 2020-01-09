@@ -1,19 +1,22 @@
-import * as authentication from '@feathersjs/authentication';
-import { Role } from '../../classes/role.class';
-import roleValidateHook from '../../hooks/role.validate.hook';
+import * as authentication from "@feathersjs/authentication";
+import roleValidateHook from "../../hooks/validate/role.validate.hook";
+import checkPermissions from "../../hooks/checkPermissions.hook";
+import roleCheckRemoveHook from "../../hooks/checkRemove/role.checkRemove.hook";
+import configuration from "@feathersjs/configuration";
+import { adminPermissionLevel } from "../consts";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [authenticate('jwt'), roleValidateHook()],
+    all: [/*authenticate('jwt'), */ roleValidateHook()],
     find: [],
     get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: []
+    create: [checkPermissions(adminPermissionLevel)],
+    update: [checkPermissions(adminPermissionLevel)],
+    patch: [checkPermissions(adminPermissionLevel)],
+    remove: [checkPermissions(adminPermissionLevel), roleCheckRemoveHook()]
   },
 
   after: {

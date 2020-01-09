@@ -1,80 +1,72 @@
-import { Db } from 'mongodb';
-import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
-import { Application } from '../../declarations';
-import { NullableId, Params, Id } from '@feathersjs/feathers';
-import { QuestionType } from '../../classes/questionType.class';
-import { EventEmitter } from 'events';
+import { Db } from "mongodb";
+import { Service, MongoDBServiceOptions } from "feathers-mongodb";
+import { Application } from "../../declarations";
+import { NullableId, Params, Id } from "@feathersjs/feathers";
+import { QuestionType } from "../../classes/questionType.class";
+import { EventEmitter } from "events";
+import { BadRequest } from "@feathersjs/errors";
 
-export class QuestionTypeServiceClass extends Service {
+export class QuestionTypeServiceClass extends Service<QuestionType> {
   public evtEmt: EventEmitter = new EventEmitter();
 
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
-    const client: Promise<Db> = app.get('mongoClient');
+    const client: Promise<Db> = app.get("mongoClient");
 
     client.then(db => {
-      this.Model = db.collection('question-types');
+      this.Model = db.collection("question-types");
 
-      this.evtEmt.emit('ready');
+      this.evtEmt.emit("ready");
     });
   }
-
   async remove(id: NullableId, params?: Params): Promise<QuestionType> {
-    let retValue = await QuestionType.fromDatas(await this._remove(id, params));
+    let dbQuestionType = await this._remove(id, params);
 
-    return retValue;
+    return QuestionType.fromDbToClass(dbQuestionType);
   }
 
-  async create(
-    questionType: QuestionType,
-    params?: Params
-  ): Promise<QuestionType> {
-    let retValue = await QuestionType.fromDatas(
-      await this._create(await QuestionType.toDatas(questionType), params)
-    );
+  async create(datas: any, params?: Params): Promise<QuestionType> {
+    let dbQuestionType = await this._create(datas, params);
 
-    return retValue;
+    return QuestionType.fromDbToClass(dbQuestionType);
   }
 
   async get(id: Id, params?: Params): Promise<QuestionType> {
-    let retValue = await QuestionType.fromDatas(await this._get(id, params));
+    let dbQuestionType = await this._get(id, params);
 
-    return retValue;
+    return QuestionType.fromDbToClass(dbQuestionType);
   }
 
   async find(params?: Params): Promise<QuestionType[]> {
-    let datasList: any = await this._find(params);
-    let retValue: QuestionType[] = [];
+    let dbQuestionTypes: any = await this._find(params);
+    let questionTypes: QuestionType[] = [];
 
-    for (const datas of datasList) {
-      retValue.push(await QuestionType.fromDatas(datas));
+    for (const dbQuestionType of dbQuestionTypes) {
+      questionTypes.push(await QuestionType.fromDbToClass(dbQuestionType));
     }
 
-    return retValue;
+    return questionTypes;
   }
 
   async update(
     id: NullableId,
-    questionType: QuestionType,
+    datas: any,
     params?: Params
   ): Promise<QuestionType> {
-    let retValue = await QuestionType.fromDatas(
-      await this._update(id, await QuestionType.toDatas(questionType), params)
-    );
+    throw new BadRequest("Update method is not implemented");
+    let dbQuestionType = await this._update(id, datas, params);
 
-    return retValue;
+    return QuestionType.fromDbToClass(dbQuestionType);
   }
 
   async patch(
     id: NullableId,
-    questionType: QuestionType,
+    datas: any,
     params?: Params
   ): Promise<QuestionType> {
-    let retValue = await QuestionType.fromDatas(
-      await this._patch(id, await QuestionType.toDatas(questionType), params)
-    );
+    let dbQuestionType = await this._patch(id, datas, params);
 
-    return retValue;
+    return QuestionType.fromDbToClass(dbQuestionType);
   }
 }

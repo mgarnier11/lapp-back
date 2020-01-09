@@ -1,7 +1,9 @@
-import { NullableId, Id } from '@feathersjs/feathers';
-import app from '../app';
-import { QuestionType } from './questionType.class';
-import { User } from './user.class';
+import { NullableId, Id } from "@feathersjs/feathers";
+import app from "../app";
+import { QuestionType } from "./questionType.class";
+import { User } from "./user.class";
+import { GameType } from "./gameType.class";
+import { DummyUser, DummyUserModel } from "./dummyUser.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -14,17 +16,34 @@ export interface GameModel {
   maxDifficulty: number;
   maxHotLevel: number;
   creatorId: NullableId;
+  creationDate: Date;
+  typeId: string;
+  status: GameStatus;
+  dummyUsers: DummyUserModel[];
 }
 
 enum GameErrors {
-  NotFound = 'Game Not Found',
-  displayId = 'Invalid DisplayId',
-  name = 'Invalid Name',
-  nbTurns = 'Invalid NbTurns',
-  actualTurn = 'Invalid ActualTurn',
-  maxDifficulty = 'Invalid MaxDifficulty',
-  maxHotLevel = 'Invalid MaxHotLevel',
-  creatorId = 'Invalid CreatorId'
+  NotFound = "Game Not Found",
+  displayId = "Invalid DisplayId",
+  name = "Invalid Name",
+  nbTurns = "Invalid NbTurns",
+  actualTurn = "Invalid ActualTurn",
+  maxDifficulty = "Invalid MaxDifficulty",
+  maxHotLevel = "Invalid MaxHotLevel",
+  creator = "Invalid Creator",
+  users = "Invalid Users",
+  userIds = "Invalid UserIds",
+  questionTypes = "Invalid QuestionTypes",
+  questionTypesIds = "Invalid QuestionTypesIds",
+  type = "Invalid Type",
+  typeId = "Invalid TypeId",
+  status = "Invalid Status"
+}
+
+export enum GameStatus {
+  created = "Created",
+  started = "Started",
+  finished = "Finished"
 }
 
 export class Game {
@@ -38,7 +57,7 @@ export class Game {
     this._id = value;
   }
 
-  private _displayId: string = '';
+  private _displayId: string = "";
   public get displayId(): string {
     return this._displayId;
   }
@@ -46,7 +65,7 @@ export class Game {
     this._displayId = value;
   }
 
-  private _name: string = '';
+  private _name: string = "";
   public get name(): string {
     return this._name;
   }
@@ -60,6 +79,18 @@ export class Game {
   }
   public set users(value: User[]) {
     this._users = value;
+  }
+
+  public get allUsers(): (User | DummyUser)[] {
+    return [...this._users, ...this._dummyUsers];
+  }
+
+  private _dummyUsers: DummyUser[] = [];
+  public get dummyUsers(): DummyUser[] {
+    return this._dummyUsers;
+  }
+  public set dummyUsers(value: DummyUser[]) {
+    this._dummyUsers = value;
   }
 
   private _nbTurns: number = 0;
@@ -110,6 +141,30 @@ export class Game {
     this._creator = value;
   }
 
+  private _creationDate: Date = new Date();
+  public get creationDate(): Date {
+    return this._creationDate;
+  }
+  public set creationDate(value: Date) {
+    this._creationDate = value;
+  }
+
+  private _type: GameType = new GameType();
+  public get type(): GameType {
+    return this._type;
+  }
+  public set type(value: GameType) {
+    this._type = value;
+  }
+
+  private _status: GameStatus = GameStatus.created;
+  public get status(): GameStatus {
+    return this._status;
+  }
+  public set status(value: GameStatus) {
+    this._status = value;
+  }
+
   /**
    *
    */
@@ -119,44 +174,76 @@ export class Game {
     return Object.assign(new Game(), datas);
   }
 
-  public static async fromDatas(datas: GameModel): Promise<Game> {
+  public static async fromDbToClass(datas: any): Promise<Game> {
     let r = new Game();
 
     r.id = datas._id;
     r.displayId = datas.displayId;
     r.name = datas.name;
-    r.users = await app.services['users'].find({
+    r.users = await app.services.users.find({
       query: { _id: { $in: datas.userIds } }
     });
+
+    if (datas.dummyUsers)
+      for (const d of datas.dummyUsers) {
+        r.dummyUsers.push(await DummyUser.fromDbToClass(d));
+      }
+
     r.nbTurns = datas.nbTurns;
     r.actualTurn = datas.actualTurn;
-    r.questionTypes = await app.services['question-types'].find({
+    r.questionTypes = await app.services["question-types"].find({
       query: { _id: { $in: datas.questionTypesIds } }
     });
     r.maxDifficulty = datas.maxDifficulty;
     r.maxHotLevel = datas.maxHotLevel;
     try {
-      r.creator = await app.services['users'].get(datas.creatorId as Id);
+      r.creator = await app.services["users"].get(datas.creatorId as Id);
     } catch (error) {
       if (error.code === 404) r.creator = new User();
       else throw error;
     }
+    r.creationDate = datas.creationDate;
+
+    try {
+      r.type = await app.services["game-types"].get(datas.typeId as string);
+    } catch (error) {
+      if (error.code === 404) r.creator = new User();
+      else throw error;
+    }
+    r.status = datas.status;
 
     return r;
   }
 
-  public static async toDatas(game: Game): Promise<GameModel> {
-    return {
-      _id: game.id,
-      displayId: game.displayId,
-      name: game.name,
-      userIds: game.users.map(u => u.id),
-      nbTurns: game.nbTurns,
-      actualTurn: game.actualTurn,
-      questionTypesIds: game.questionTypes.map(qt => qt.id),
-      maxDifficulty: game.maxDifficulty,
-      maxHotLevel: game.maxHotLevel,
-      creatorId: game.creator.id
+  public static fromFrontToDb(datas: any): Partial<GameModel> {
+    let dbDatas: Partial<GameModel> = {
+      displayId: datas.displayId,
+      name: datas.name,
+      nbTurns: datas.nbTurns,
+      actualTurn: datas.actualTurn,
+      maxDifficulty: datas.maxDifficulty,
+      maxHotLevel: datas.maxHotLevel,
+      status: datas.status
     };
+
+    if (datas.dummyUsers)
+      dbDatas.dummyUsers = datas.dummyUsers.map(d =>
+        DummyUser.fromFrontToDb(d)
+      );
+
+    if (datas.users)
+      dbDatas.userIds = [...new Set<NullableId>(datas.users.map(u => u.id))];
+    else if (datas.userIds)
+      dbDatas.userIds = [...new Set<NullableId>(datas.userIds)];
+
+    if (datas.questionTypes)
+      dbDatas.questionTypesIds = datas.questionTypes.map(qt => qt.id);
+    else if (datas.questionTypesIds)
+      dbDatas.questionTypesIds = datas.questionTypesIds;
+
+    if (datas.type) dbDatas.typeId = datas.type.id;
+    else if (datas.typeId) dbDatas.typeId = datas.typeId;
+
+    return dbDatas;
   }
 }
