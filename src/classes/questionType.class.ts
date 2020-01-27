@@ -3,6 +3,7 @@ import { NullableId } from "@feathersjs/feathers";
 export interface QuestionTypeModel {
   _id: NullableId;
   name: string;
+  description: string;
 }
 
 enum QuestionTypeErrors {
@@ -30,6 +31,14 @@ export class QuestionType {
     this._name = value;
   }
 
+  private _description: string = "";
+  public get description(): string {
+    return this._description;
+  }
+  public set description(value: string) {
+    this._description = value;
+  }
+
   /**
    *
    */
@@ -44,13 +53,15 @@ export class QuestionType {
 
     r.id = datas._id;
     r.name = datas.name;
+    r.description = datas.description;
 
     return r;
   }
 
   public static fromFrontToDb(datas: any): Partial<QuestionTypeModel> {
     let dbDatas: Partial<QuestionTypeModel> = {
-      name: datas.name
+      name: datas.name,
+      description: datas.description
     };
 
     return dbDatas;
