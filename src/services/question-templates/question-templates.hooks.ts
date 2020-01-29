@@ -1,8 +1,7 @@
 import * as authentication from "@feathersjs/authentication";
-import roleValidateHook from "../../hooks/validate/role.validate.hook";
 import checkPermissions from "../../hooks/checkPermissions.hook";
-import roleCheckRemoveHook from "../../hooks/checkRemove/role.checkRemove.hook";
-import configuration from "@feathersjs/configuration";
+import questionTemplateValidateHook from "../../hooks/validate/question-template.validate.hook";
+import questionTemplatecheckRemove from "../../hooks/checkRemove/question-template.checkRemove.hook";
 import { adminPermissionLevel } from "../consts";
 // Don't remove this comment. It's needed to format import lines nicely.
 
@@ -10,13 +9,16 @@ const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [authenticate("jwt"), roleValidateHook()],
+    all: [authenticate("jwt"), questionTemplateValidateHook()],
     find: [],
     get: [],
     create: [checkPermissions(adminPermissionLevel)],
     update: [checkPermissions(adminPermissionLevel)],
     patch: [checkPermissions(adminPermissionLevel)],
-    remove: [checkPermissions(adminPermissionLevel), roleCheckRemoveHook()]
+    remove: [
+      checkPermissions(adminPermissionLevel),
+      questionTemplatecheckRemove()
+    ]
   },
 
   after: {
