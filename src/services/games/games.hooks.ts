@@ -8,7 +8,7 @@ const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [/*authenticate('jwt')*/ gameValidateHook()],
+    all: [authenticate("jwt"), gameValidateHook()],
     find: [],
     get: [],
     create: [],

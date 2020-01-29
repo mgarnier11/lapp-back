@@ -1,14 +1,19 @@
 import { NullableId } from "@feathersjs/feathers";
+import { QuestionTemplate } from "./questionTemplate.class";
+import app from "../app";
 
 export interface QuestionTypeModel {
   _id: NullableId;
   name: string;
   description: string;
+  templateId: NullableId;
 }
 
 enum QuestionTypeErrors {
   NotFound = "QuestionType Not Found",
   name = "Invalid Name",
+  description = "Invalid Description",
+  template = "Invalid Template",
   QuestionsAssigned = "Questions are assigned to this type"
 }
 
@@ -39,6 +44,14 @@ export class QuestionType {
     this._description = value;
   }
 
+  private _template: QuestionTemplate = new QuestionTemplate();
+  public get template(): QuestionTemplate {
+    return this._template;
+  }
+  public set template(value: QuestionTemplate) {
+    this._template = value;
+  }
+
   /**
    *
    */
@@ -55,6 +68,15 @@ export class QuestionType {
     r.name = datas.name;
     r.description = datas.description;
 
+    try {
+      r.template = await app.services["question-templates"].get(
+        datas.templateId as string
+      );
+    } catch (error) {
+      if (error.code === 404) r.template = new QuestionTemplate();
+      else throw error;
+    }
+
     return r;
   }
 
@@ -63,6 +85,9 @@ export class QuestionType {
       name: datas.name,
       description: datas.description
     };
+
+    if (datas.template) dbDatas.templateId = datas.template.id;
+    else if (datas.templateId) dbDatas.templateId = datas.templateId;
 
     return dbDatas;
   }

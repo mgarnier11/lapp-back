@@ -2,7 +2,7 @@
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { Hook, HookContext } from "@feathersjs/feathers";
 import * as Validator from "validate.js";
-import { QuestionType } from "../../classes/questionType.class";
+import { QuestionTemplate } from "../../classes/questionTemplate.class";
 import { BadRequest } from "@feathersjs/errors";
 import { ObjectID } from "bson";
 
@@ -23,22 +23,12 @@ export default (options = {}): Hook => {
       /* check if present datas are valid*/
 
       if (!Validator.isString(oldData.name))
-        throw new BadRequest(QuestionType.Errors.name);
+        throw new BadRequest(QuestionTemplate.Errors.name);
 
-      if (!Validator.isString(oldData.description))
-        throw new BadRequest(QuestionType.Errors.description);
+      if (!Validator.isString(oldData.clientPath))
+        throw new BadRequest(QuestionTemplate.Errors.clientPath);
 
-      if (oldData.template) {
-        if (!Validator.isObject(oldData.template))
-          throw new BadRequest(QuestionType.Errors.template);
-      } else if (oldData.templateId) {
-        if (!ObjectID.isValid(oldData.templateId))
-          throw new BadRequest(QuestionType.Errors.template);
-      } else {
-        throw new BadRequest(QuestionType.Errors.template);
-      }
-
-      let newData = QuestionType.fromFrontToDb(oldData);
+      let newData = QuestionTemplate.fromFrontToDb(oldData);
 
       context.data = newData;
     }
