@@ -10,7 +10,7 @@ const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [/*authenticate("jwt"),*/ questionValidateHook()],
+    all: [authenticate("jwt"), questionValidateHook()],
     find: [],
     get: [],
     create: [],
