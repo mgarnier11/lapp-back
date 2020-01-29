@@ -10,13 +10,13 @@ const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [authenticate("jwt"), questionValidateHook()],
+    all: [questionValidateHook()],
     find: [],
     get: [],
-    create: [],
-    update: [],
-    patch: [questionCheckPatchHook()],
-    remove: [questionCheckRemoveHook()]
+    create: [authenticate("jwt")],
+    update: [authenticate("jwt")],
+    patch: [authenticate("jwt"), questionCheckPatchHook()],
+    remove: [authenticate("jwt"), questionCheckRemoveHook()]
   },
 
   after: {
