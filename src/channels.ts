@@ -65,6 +65,10 @@ export default function(app: Application) {
     return app.channel("authenticated");
   });
 
+  app.service("question-templates").publish((data: any, hook: HookContext) => {
+    return app.channel("authenticated");
+  });
+
   /*
   // eslint-disable-next-line no-unused-vars
   app.publish((data: any, hook: HookContext) => {
