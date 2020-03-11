@@ -4,6 +4,7 @@ import { QuestionType } from "./questionType.class";
 import { User } from "./user.class";
 import { GameType } from "./gameType.class";
 import { DummyUser, DummyUserModel } from "./dummyUser.class";
+import { Question } from "./question.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -20,6 +21,8 @@ export interface GameModel {
   typeId: string;
   status: GameStatus;
   dummyUsers: DummyUserModel[];
+  scores: number[];
+  actualQuestionId: NullableId;
 }
 
 enum GameErrors {
@@ -165,6 +168,22 @@ export class Game {
     this._status = value;
   }
 
+  private _scores: number[] = [];
+  public get scores(): number[] {
+    return this._scores;
+  }
+  public set scores(value: number[]) {
+    this._scores = value;
+  }
+
+  private _actualQuestion: Question = new Question();
+  public get actualQuestion(): Question {
+    return this._actualQuestion;
+  }
+  public set actualQuestion(value: Question) {
+    this._actualQuestion = value;
+  }
+
   /**
    *
    */
@@ -211,6 +230,16 @@ export class Game {
       else throw error;
     }
     r.status = datas.status;
+    r.scores = datas.scores;
+
+    try {
+      r.actualQuestion = await app.services["questions"].get(
+        (datas.actualQuestionId as string) ?? ""
+      );
+    } catch (error) {
+      if (error.code === 404) r.actualQuestion = new Question();
+      else throw error;
+    }
 
     return r;
   }
@@ -223,7 +252,8 @@ export class Game {
       actualTurn: datas.actualTurn,
       maxDifficulty: datas.maxDifficulty,
       maxHotLevel: datas.maxHotLevel,
-      status: datas.status
+      status: datas.status,
+      scores: datas.scores
     };
 
     if (datas.dummyUsers)
@@ -243,6 +273,11 @@ export class Game {
 
     if (datas.type) dbDatas.typeId = datas.type.id;
     else if (datas.typeId) dbDatas.typeId = datas.typeId;
+
+    if (datas.actualQuestion)
+      dbDatas.actualQuestionId = datas.actualQuestion.id;
+    else if (datas.actualQuestionId)
+      dbDatas.actualQuestionId = datas.actualQuestionId;
 
     return dbDatas;
   }
