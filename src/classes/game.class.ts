@@ -5,6 +5,7 @@ import { User } from "./user.class";
 import { GameType } from "./gameType.class";
 import { DummyUser, DummyUserModel } from "./dummyUser.class";
 import { Question } from "./question.class";
+import { Score, ScoreModel } from "./score.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -21,7 +22,7 @@ export interface GameModel {
   typeId: string;
   status: GameStatus;
   dummyUsers: DummyUserModel[];
-  scores: number[];
+  scores: ScoreModel[];
   actualQuestionId: NullableId;
 }
 
@@ -168,11 +169,11 @@ export class Game {
     this._status = value;
   }
 
-  private _scores: number[] = [];
-  public get scores(): number[] {
+  private _scores: Score[] = [];
+  public get scores(): Score[] {
     return this._scores;
   }
-  public set scores(value: number[]) {
+  public set scores(value: Score[]) {
     this._scores = value;
   }
 
@@ -230,7 +231,6 @@ export class Game {
       else throw error;
     }
     r.status = datas.status;
-    r.scores = datas.scores;
 
     try {
       r.actualQuestion = await app.services["questions"].get(
@@ -240,6 +240,11 @@ export class Game {
       if (error.code === 404) r.actualQuestion = new Question();
       else throw error;
     }
+
+    if (datas.scores)
+      for (const s of datas.scores) {
+        r.scores.push(await Score.fromDbToClass(s));
+      }
 
     return r;
   }
@@ -278,6 +283,9 @@ export class Game {
       dbDatas.actualQuestionId = datas.actualQuestion.id;
     else if (datas.actualQuestionId)
       dbDatas.actualQuestionId = datas.actualQuestionId;
+
+    if (datas.scores)
+      dbDatas.scores = datas.scores.map(s => Score.fromFrontToDb(s));
 
     return dbDatas;
   }
