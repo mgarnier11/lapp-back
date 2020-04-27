@@ -11,12 +11,12 @@ declare module "../../declarations" {
   }
 }
 
-export default function(app: Application) {
+export default function (app: Application) {
   const paginate = app.get("paginate");
 
   const options = {
     paginate: false,
-    whitelist: ["$elemMatch"]
+    whitelist: ["$elemMatch"],
   };
 
   // Initialize our service with any options it requires
@@ -24,6 +24,10 @@ export default function(app: Application) {
 
   // Get our initialized service so that we can register hooks
   const service = app.service("games");
+
+  service.on("test", () => {
+    console.log("patate");
+  });
 
   service.hooks(hooks);
 }
