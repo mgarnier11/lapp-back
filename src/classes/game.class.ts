@@ -41,13 +41,13 @@ enum GameErrors {
   questionTypesIds = "Invalid QuestionTypesIds",
   type = "Invalid Type",
   typeId = "Invalid TypeId",
-  status = "Invalid Status"
+  status = "Invalid Status",
 }
 
 export enum GameStatus {
   created = "Created",
   started = "Started",
-  finished = "Finished"
+  finished = "Finished",
 }
 
 export class Game {
@@ -201,7 +201,7 @@ export class Game {
     r.displayId = datas.displayId;
     r.name = datas.name;
     r.users = await app.services.users.find({
-      query: { _id: { $in: datas.userIds } }
+      query: { _id: { $in: datas.userIds } },
     });
 
     if (datas.dummyUsers)
@@ -212,7 +212,7 @@ export class Game {
     r.nbTurns = datas.nbTurns;
     r.actualTurn = datas.actualTurn;
     r.questionTypes = await app.services["question-types"].find({
-      query: { _id: { $in: datas.questionTypesIds } }
+      query: { _id: { $in: datas.questionTypesIds } },
     });
     r.maxDifficulty = datas.maxDifficulty;
     r.maxHotLevel = datas.maxHotLevel;
@@ -258,21 +258,20 @@ export class Game {
       maxDifficulty: datas.maxDifficulty,
       maxHotLevel: datas.maxHotLevel,
       status: datas.status,
-      scores: datas.scores
     };
 
     if (datas.dummyUsers)
-      dbDatas.dummyUsers = datas.dummyUsers.map(d =>
+      dbDatas.dummyUsers = datas.dummyUsers.map((d) =>
         DummyUser.fromFrontToDb(d)
       );
 
     if (datas.users)
-      dbDatas.userIds = [...new Set<NullableId>(datas.users.map(u => u.id))];
+      dbDatas.userIds = [...new Set<NullableId>(datas.users.map((u) => u.id))];
     else if (datas.userIds)
       dbDatas.userIds = [...new Set<NullableId>(datas.userIds)];
 
     if (datas.questionTypes)
-      dbDatas.questionTypesIds = datas.questionTypes.map(qt => qt.id);
+      dbDatas.questionTypesIds = datas.questionTypes.map((qt) => qt.id);
     else if (datas.questionTypesIds)
       dbDatas.questionTypesIds = datas.questionTypesIds;
 
@@ -285,7 +284,7 @@ export class Game {
       dbDatas.actualQuestionId = datas.actualQuestionId;
 
     if (datas.scores)
-      dbDatas.scores = datas.scores.map(s => Score.fromFrontToDb(s));
+      dbDatas.scores = datas.scores.map((s) => Score.fromFrontToDb(s));
 
     return dbDatas;
   }
