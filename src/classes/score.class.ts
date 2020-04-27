@@ -44,7 +44,7 @@ export class Score {
   public static fromFrontToDb(datas: any): Partial<ScoreModel> {
     let dbDatas: Partial<ScoreModel> = {
       score: datas.score,
-      userId: datas.userId
+      userId: datas.userId,
     };
 
     return dbDatas;
