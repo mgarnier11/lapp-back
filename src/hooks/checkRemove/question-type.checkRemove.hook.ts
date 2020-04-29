@@ -8,8 +8,8 @@ export default (options = {}): Hook => {
   return async (context: HookContext) => {
     let questions = await context.app.service("questions").find({
       query: {
-        typeId: context.id
-      }
+        typeId: context.id,
+      },
     });
 
     if (questions.length > 0)

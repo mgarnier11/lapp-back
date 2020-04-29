@@ -16,7 +16,7 @@ export default (options = {}): Hook => {
       if (typeof query._id === "string") {
         query._id = new ObjectID(query._id);
       } else if (query._id.$in) {
-        query._id.$in = query._id.$in.map(id => new ObjectID(id));
+        query._id.$in = query._id.$in.map((id) => new ObjectID(id));
       }
     }
     if (method === "create" || method === "patch") {

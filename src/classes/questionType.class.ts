@@ -7,6 +7,7 @@ export interface QuestionTypeModel {
   name: string;
   description: string;
   templateId: NullableId;
+  hasQuestions: boolean;
 }
 
 enum QuestionTypeErrors {
@@ -14,7 +15,7 @@ enum QuestionTypeErrors {
   name = "Invalid Name",
   description = "Invalid Description",
   template = "Invalid Template",
-  QuestionsAssigned = "Questions are assigned to this type"
+  QuestionsAssigned = "Questions are assigned to this type",
 }
 
 export class QuestionType {
@@ -52,6 +53,14 @@ export class QuestionType {
     this._template = value;
   }
 
+  private _hasQuestions: boolean = false;
+  public get hasQuestions(): boolean {
+    return this._hasQuestions;
+  }
+  public set hasQuestions(value: boolean) {
+    this._hasQuestions = value;
+  }
+
   /**
    *
    */
@@ -67,6 +76,7 @@ export class QuestionType {
     r.id = datas._id;
     r.name = datas.name;
     r.description = datas.description;
+    r.hasQuestions = datas.hasQuestions;
 
     try {
       r.template = await app.services["question-templates"].get(
@@ -80,10 +90,24 @@ export class QuestionType {
     return r;
   }
 
+  public static fromClassToDb(
+    questionType: QuestionType
+  ): Partial<QuestionTypeModel> {
+    let dbDatas: Partial<QuestionTypeModel> = {
+      name: questionType.name,
+      description: questionType.description,
+      hasQuestions: questionType.hasQuestions,
+      templateId: questionType.template.id,
+    };
+
+    return dbDatas;
+  }
+
   public static fromFrontToDb(datas: any): Partial<QuestionTypeModel> {
     let dbDatas: Partial<QuestionTypeModel> = {
       name: datas.name,
-      description: datas.description
+      description: datas.description,
+      hasQuestions: datas.hasQuestions,
     };
 
     if (datas.template) dbDatas.templateId = datas.template.id;
