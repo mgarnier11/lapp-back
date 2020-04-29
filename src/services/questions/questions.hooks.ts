@@ -4,6 +4,10 @@ import checkPermissions from "../../hooks/checkPermissions.hook";
 import questionCheckRemoveHook from "../../hooks/checkRemove/question.checkRemove.hook";
 import questionCheckPatchHook from "../../hooks/checkPatch/question.checkPatch.hook";
 import { adminPermissionLevel } from "../consts";
+import {
+  beforeUpsertHook,
+  beforeRemoveHook,
+} from "../../hooks/question/checkHasQuestions.hooks";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
@@ -13,10 +17,10 @@ export default {
     all: [authenticate("jwt"), questionValidateHook()],
     find: [],
     get: [],
-    create: [],
+    create: [beforeUpsertHook()],
     update: [],
-    patch: [questionCheckPatchHook()],
-    remove: [questionCheckRemoveHook()]
+    patch: [questionCheckPatchHook(), beforeUpsertHook()],
+    remove: [questionCheckRemoveHook(), beforeRemoveHook()],
   },
 
   after: {
@@ -26,7 +30,7 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [],
   },
 
   error: {
@@ -36,6 +40,6 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
-  }
+    remove: [],
+  },
 };
