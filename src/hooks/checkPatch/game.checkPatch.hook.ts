@@ -3,12 +3,17 @@
 import { Hook, HookContext } from "@feathersjs/feathers";
 import { QuestionType } from "../../classes/questionType.class";
 import { BadRequest } from "@feathersjs/errors";
+import { User } from "../../classes/user.class";
 
 export default (options = {}): Hook => {
   return async (context: HookContext) => {
-    let game = await context.app.service("games").get(context.id);
+    const game = await context.app.service("games").get(context.id);
+    const params = context.params as any;
 
-    if (String(game.creator.id) !== String((context.params as any).user.id))
+    if (
+      String(game.creator.id) !==
+      (params instanceof User ? String(params.id) : String(params.user.id))
+    )
       throw new BadRequest("Not authorized");
 
     return context;
