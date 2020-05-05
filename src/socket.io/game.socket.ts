@@ -7,9 +7,15 @@ import { User } from "../classes/user.class";
 import { Score } from "../classes/score.class";
 import { GameStatus } from "../classes/game.class";
 
-interface Params {
+interface BaseParams {
   gameId: string;
   jwt: string;
+}
+
+interface AnswerQuestionParams {
+  userId: string;
+  questionId: string;
+  answer: boolean;
 }
 
 export enum MySocketErrors {
@@ -56,7 +62,7 @@ export const gameSocket = (
 
   console.log(`${socket.id} connected`);
 
-  socket.on("game:join", async (params: Params, cb) => {
+  socket.on("game:join", async (params: BaseParams, cb) => {
     const authParams = await getAuthParams(params.jwt);
 
     console.log(`${socket.id} joined game room : ${params.gameId}`);
@@ -66,7 +72,7 @@ export const gameSocket = (
     if (typeof cb === "function") cb("ok");
   });
 
-  socket.on("game:start", async (params: Params, cb) => {
+  socket.on("game:start", async (params: BaseParams, cb) => {
     const authParams = await getAuthParams(params.jwt);
 
     io.to(getGameRoomName(params.gameId)).emit("game:loading", true);
@@ -103,9 +109,18 @@ export const gameSocket = (
     }
   });
 
-  socket.on("game:answerQuestion", () => {});
+  socket.on(
+    "game:answerQuestion",
+    async (params: BaseParams & AnswerQuestionParams) => {
+      const authParams = await getAuthParams(params.jwt);
 
-  socket.on("game:leave", async (params: Params, cb) => {
+      console.log(
+        `${socket.id} answered ${params.answer} to question ${params.questionId} for user ${params.userId}`
+      );
+    }
+  );
+
+  socket.on("game:leave", async (params: BaseParams, cb) => {
     const authParams = await getAuthParams(params.jwt);
 
     console.log(`${socket.id} left game room : ${params.gameId}`);
