@@ -35,8 +35,8 @@ export class Score {
   public static async fromDbToClass(datas: any): Promise<Score> {
     let r = new Score();
 
-    r.score = datas._score;
-    r.userId = datas._userId;
+    r.score = datas.score;
+    r.userId = datas.userId;
 
     return r;
   }

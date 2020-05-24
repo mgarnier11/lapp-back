@@ -5,7 +5,8 @@ import { Application } from "../declarations";
 import { MySocket } from "./types";
 import { User } from "../classes/user.class";
 import { Score } from "../classes/score.class";
-import { GameStatus } from "../classes/game.class";
+import { GameStatus, Game } from "../classes/game.class";
+import { Question } from "../classes/question.class";
 
 interface BaseParams {
   gameId: string;
@@ -13,8 +14,8 @@ interface BaseParams {
 }
 
 interface AnswerQuestionParams {
-  userId: string;
-  questionId: string;
+  // userId: string;
+  // questionId: string;
   answer: boolean;
 }
 
@@ -30,6 +31,16 @@ export const gameSocket = (
   app: Application,
   io: SocketIO.Server
 ) => {
+  const getQuestions = (game: Game): Promise<Question[]> => {
+    return app.services.questions.find({
+      query: {
+        typeId: {
+          $in: game.questionTypes.map((qT) => qT.id?.toString()),
+        },
+      },
+    });
+  };
+
   const getAuthParams = async (jwt: string): Promise<FeathersParams> => {
     if (!socket.user) {
       if (jwt) {
@@ -79,13 +90,7 @@ export const gameSocket = (
 
     const game = await app.services.games.get(params.gameId);
 
-    const questions = await app.services.questions.find({
-      query: {
-        typeId: {
-          $in: game.questionTypes.map((qT) => qT.id?.toString()),
-        },
-      },
-    });
+    const questions = await getQuestions(game);
 
     try {
       game.actualQuestion =
@@ -103,6 +108,7 @@ export const gameSocket = (
         game,
         authParams
       );
+
       // io.to(getGameRoomName(params.gameId)).emit("game:loading", false);
     } catch (error) {
       console.log(error);
@@ -114,8 +120,39 @@ export const gameSocket = (
     async (params: BaseParams & AnswerQuestionParams) => {
       const authParams = await getAuthParams(params.jwt);
 
+      io.to(getGameRoomName(params.gameId)).emit("game:loading", true);
+
+      const game = await app.services.games.get(params.gameId);
+      const playingPlayer = game.getActualplayer();
+
       console.log(
-        `${socket.id} answered ${params.answer} to question ${params.questionId} for user ${params.userId}`
+        `${socket.id} answered ${params.answer} to question ${game.actualQuestion.id} for user ${playingPlayer.id}`
+      );
+
+      console.log(game.scores);
+
+      game.scores = game.scores.map((s) => {
+        if (s.userId === playingPlayer.id?.toString()) {
+          s.score += params.answer ? game.actualQuestion.difficulty : 0;
+        }
+        return s;
+      });
+
+      if (game.actualTurn >= game.nbTurns) {
+        game.status = GameStatus.finished;
+      } else {
+        game.actualTurn++;
+
+        const questions = await getQuestions(game);
+
+        game.actualQuestion =
+          questions[Math.floor(Math.random() * questions.length)];
+      }
+
+      const updatedGame = await app.services.games.patch(
+        game.id,
+        game,
+        authParams
       );
     }
   );
