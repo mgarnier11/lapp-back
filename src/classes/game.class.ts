@@ -1,4 +1,6 @@
 import { NullableId, Id } from "@feathersjs/feathers";
+import seedRandom from "seedrandom";
+
 import app from "../app";
 import { QuestionType } from "./questionType.class";
 import { User } from "./user.class";
@@ -287,5 +289,58 @@ export class Game {
       dbDatas.scores = datas.scores.map((s) => Score.fromFrontToDb(s));
 
     return dbDatas;
+  }
+
+  public getActualPlayerIndex(): number {
+    return Game.getPlayerIndex(
+      this.actualTurn,
+      this.nbTurns,
+      this.allUsers.length,
+      this.displayId
+    );
+  }
+
+  public getActualplayer(): User | DummyUser {
+    let userIndex = Game.getPlayerIndex(
+      this.actualTurn,
+      this.nbTurns,
+      this.allUsers.length,
+      this.displayId
+    );
+
+    return this.allUsers[userIndex];
+  }
+
+  public static getPlayerIndex(
+    actualTurn: number,
+    nbTurns: number,
+    nbPlayers: number,
+    seed: string
+  ): number {
+    let rng = seedRandom(seed);
+
+    let playersNbTurns: number[] = [...new Array(nbPlayers)].fill(
+      Math.ceil(nbTurns / nbPlayers)
+    );
+
+    function choosePlayer(): number {
+      let choosedPlayer = Math.floor(rng() * nbPlayers);
+
+      if (playersNbTurns[choosedPlayer] === 0) {
+        return choosePlayer();
+      }
+
+      return choosedPlayer;
+    }
+
+    let choosedPlayer = 0;
+
+    for (let i = 0; i < actualTurn; i++) {
+      choosedPlayer = choosePlayer();
+
+      playersNbTurns[choosedPlayer] = playersNbTurns[choosedPlayer] - 1;
+    }
+
+    return choosedPlayer;
   }
 }
