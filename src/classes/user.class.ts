@@ -12,6 +12,7 @@ export interface UserModel {
   password: string;
   roleId: NullableId;
   gender: number;
+  darkMode: boolean;
 }
 
 enum UserErrors {
@@ -22,6 +23,7 @@ enum UserErrors {
   role = "Invalid Role",
   roleId = "Invalid RoleId",
   gender = "Invalid Gender",
+  darkMode = "Invalid DarkMode",
   idVice = "Invalid method for ID-Vice"
 }
 
@@ -76,11 +78,13 @@ export class User {
     this._gender = value;
   }
 
-  /*
-  public toJSON(): object {
-    return JSON.parse(JSON.stringify(this));
+  private _darkMode: boolean = false;
+  public get darkMode(): boolean {
+    return this._darkMode;
   }
-  */
+  public set darkMode(value: boolean) {
+    this._darkMode = value;
+  }
 
   /**
    *
@@ -99,12 +103,15 @@ export class User {
     r.email = datas.email;
     r.gender = datas.gender;
     r.password = datas.password;
+    r.darkMode = datas.darkMode;
+
     try {
       r.role = await app.services["roles"].get(datas.roleId as Id);
     } catch (error) {
       if (error.code === 404) r.role = new Role();
       else throw error;
     }
+
     return r;
   }
 
@@ -113,7 +120,8 @@ export class User {
       name: datas.name,
       email: datas.email,
       password: datas.password,
-      gender: datas.gender
+      gender: datas.gender,
+      darkMode: datas.darkMode
     };
 
     if (datas.role) dbDatas.roleId = datas.role.id;

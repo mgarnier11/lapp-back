@@ -9,7 +9,7 @@ const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [/*authenticate("jwt"),*/ questionTypeValidateHook()],
+    all: [authenticate("jwt"), questionTypeValidateHook()],
     find: [],
     get: [],
     create: [checkPermissions(adminPermissionLevel)],

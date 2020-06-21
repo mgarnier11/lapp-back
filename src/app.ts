@@ -20,6 +20,8 @@ import appHooks from "./app.hooks";
 import channels from "./channels";
 import authentication from "./authentication";
 import mongodb from "./mongodb";
+import { gameSocket } from "./socket.io/game.socket";
+import { MySocket } from "./socket.io/types";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const app: Application = express(feathers());
@@ -38,7 +40,13 @@ app.use("/", express.static(app.get("public")));
 
 // Set up Plugins and providers
 app.configure(express.rest());
-app.configure(socketio());
+app.configure(
+  socketio((io) => {
+    io.on("connection", (socket: MySocket) => {
+      gameSocket(socket, app, io);
+    });
+  })
+);
 
 app.configure(mongodb);
 

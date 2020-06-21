@@ -1,9 +1,13 @@
 import { NullableId, Id } from "@feathersjs/feathers";
+import seedRandom from "seedrandom";
+
 import app from "../app";
 import { QuestionType } from "./questionType.class";
 import { User } from "./user.class";
 import { GameType } from "./gameType.class";
 import { DummyUser, DummyUserModel } from "./dummyUser.class";
+import { Question } from "./question.class";
+import { Score, ScoreModel } from "./score.class";
 
 export interface GameModel {
   _id: NullableId;
@@ -20,6 +24,8 @@ export interface GameModel {
   typeId: string;
   status: GameStatus;
   dummyUsers: DummyUserModel[];
+  scores: ScoreModel[];
+  actualQuestionId: NullableId;
 }
 
 enum GameErrors {
@@ -37,13 +43,13 @@ enum GameErrors {
   questionTypesIds = "Invalid QuestionTypesIds",
   type = "Invalid Type",
   typeId = "Invalid TypeId",
-  status = "Invalid Status"
+  status = "Invalid Status",
 }
 
 export enum GameStatus {
   created = "Created",
   started = "Started",
-  finished = "Finished"
+  finished = "Finished",
 }
 
 export class Game {
@@ -165,6 +171,22 @@ export class Game {
     this._status = value;
   }
 
+  private _scores: Score[] = [];
+  public get scores(): Score[] {
+    return this._scores;
+  }
+  public set scores(value: Score[]) {
+    this._scores = value;
+  }
+
+  private _actualQuestion: Question = new Question();
+  public get actualQuestion(): Question {
+    return this._actualQuestion;
+  }
+  public set actualQuestion(value: Question) {
+    this._actualQuestion = value;
+  }
+
   /**
    *
    */
@@ -181,7 +203,7 @@ export class Game {
     r.displayId = datas.displayId;
     r.name = datas.name;
     r.users = await app.services.users.find({
-      query: { _id: { $in: datas.userIds } }
+      query: { _id: { $in: datas.userIds } },
     });
 
     if (datas.dummyUsers)
@@ -192,7 +214,7 @@ export class Game {
     r.nbTurns = datas.nbTurns;
     r.actualTurn = datas.actualTurn;
     r.questionTypes = await app.services["question-types"].find({
-      query: { _id: { $in: datas.questionTypesIds } }
+      query: { _id: { $in: datas.questionTypesIds } },
     });
     r.maxDifficulty = datas.maxDifficulty;
     r.maxHotLevel = datas.maxHotLevel;
@@ -212,6 +234,20 @@ export class Game {
     }
     r.status = datas.status;
 
+    try {
+      r.actualQuestion = await app.services["questions"].get(
+        (datas.actualQuestionId as string) ?? ""
+      );
+    } catch (error) {
+      if (error.code === 404) r.actualQuestion = new Question();
+      else throw error;
+    }
+
+    if (datas.scores)
+      for (const s of datas.scores) {
+        r.scores.push(await Score.fromDbToClass(s));
+      }
+
     return r;
   }
 
@@ -223,27 +259,88 @@ export class Game {
       actualTurn: datas.actualTurn,
       maxDifficulty: datas.maxDifficulty,
       maxHotLevel: datas.maxHotLevel,
-      status: datas.status
+      status: datas.status,
     };
 
     if (datas.dummyUsers)
-      dbDatas.dummyUsers = datas.dummyUsers.map(d =>
+      dbDatas.dummyUsers = datas.dummyUsers.map((d) =>
         DummyUser.fromFrontToDb(d)
       );
 
     if (datas.users)
-      dbDatas.userIds = [...new Set<NullableId>(datas.users.map(u => u.id))];
+      dbDatas.userIds = [...new Set<NullableId>(datas.users.map((u) => u.id))];
     else if (datas.userIds)
       dbDatas.userIds = [...new Set<NullableId>(datas.userIds)];
 
     if (datas.questionTypes)
-      dbDatas.questionTypesIds = datas.questionTypes.map(qt => qt.id);
+      dbDatas.questionTypesIds = datas.questionTypes.map((qt) => qt.id);
     else if (datas.questionTypesIds)
       dbDatas.questionTypesIds = datas.questionTypesIds;
 
     if (datas.type) dbDatas.typeId = datas.type.id;
     else if (datas.typeId) dbDatas.typeId = datas.typeId;
 
+    if (datas.actualQuestion)
+      dbDatas.actualQuestionId = datas.actualQuestion.id;
+    else if (datas.actualQuestionId)
+      dbDatas.actualQuestionId = datas.actualQuestionId;
+
+    if (datas.scores)
+      dbDatas.scores = datas.scores.map((s) => Score.fromFrontToDb(s));
+
     return dbDatas;
+  }
+
+  public getActualPlayerIndex(): number {
+    return Game.getPlayerIndex(
+      this.actualTurn,
+      this.nbTurns,
+      this.allUsers.length,
+      this.displayId
+    );
+  }
+
+  public getActualplayer(): User | DummyUser {
+    let userIndex = Game.getPlayerIndex(
+      this.actualTurn,
+      this.nbTurns,
+      this.allUsers.length,
+      this.displayId
+    );
+
+    return this.allUsers[userIndex];
+  }
+
+  public static getPlayerIndex(
+    actualTurn: number,
+    nbTurns: number,
+    nbPlayers: number,
+    seed: string
+  ): number {
+    let rng = seedRandom(seed);
+
+    let playersNbTurns: number[] = [...new Array(nbPlayers)].fill(
+      Math.ceil(nbTurns / nbPlayers)
+    );
+
+    function choosePlayer(): number {
+      let choosedPlayer = Math.floor(rng() * nbPlayers);
+
+      if (playersNbTurns[choosedPlayer] === 0) {
+        return choosePlayer();
+      }
+
+      return choosedPlayer;
+    }
+
+    let choosedPlayer = 0;
+
+    for (let i = 0; i < actualTurn; i++) {
+      choosedPlayer = choosePlayer();
+
+      playersNbTurns[choosedPlayer] = playersNbTurns[choosedPlayer] - 1;
+    }
+
+    return choosedPlayer;
   }
 }

@@ -3,7 +3,7 @@ import { Application } from "./declarations";
 import { User } from "./classes/user.class";
 import { adminPermissionLevel } from "./services/consts";
 
-export default function(app: Application) {
+export default function (app: Application) {
   if (typeof app.channel !== "function") {
     // If no real-time functionality has been configured just return
     return;
@@ -62,6 +62,10 @@ export default function(app: Application) {
   });
 
   app.service("games").publish((data: any, hook: HookContext) => {
+    return app.channel("authenticated");
+  });
+
+  app.service("question-templates").publish((data: any, hook: HookContext) => {
     return app.channel("authenticated");
   });
 

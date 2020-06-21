@@ -34,12 +34,14 @@ export default (options = {}): Hook => {
         const name = await app.service("users").getNextIDViceName();
         const password = User.generatePwd(oldData.email, name).toString();
         const gender = -1;
+        const darkMode = false;
 
         let idViceUser = User.fromFrontToDb({
           name,
           email: oldData.email,
           password,
-          gender
+          gender,
+          darkMode
         });
 
         idViceUser.roleId = (
@@ -79,6 +81,9 @@ export default (options = {}): Hook => {
 
       if (!Validator.isInteger(oldData.gender))
         throw new BadRequest(User.Errors.gender);
+
+      if (!Validator.isBoolean(oldData.darkMode))
+        throw new BadRequest(User.Errors.darkMode);
 
       let newData = User.fromFrontToDb(oldData);
 

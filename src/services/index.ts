@@ -3,6 +3,7 @@ import users from "./users/users.service";
 import roles from "./roles/roles.service";
 import questionTypes from "./question-types/question-types.service";
 import questions from "./questions/questions.service";
+import questionTemplates from "./question-templates/question-templates.service";
 import games from "./games/games.service";
 import gameTypes from "./game-types/game-types.service";
 
@@ -13,6 +14,7 @@ export default function(app: Application) {
   app.configure(users);
   app.configure(questionTypes);
   app.configure(questions);
+  app.configure(questionTemplates);
   app.configure(games);
   app.configure(gameTypes);
 }

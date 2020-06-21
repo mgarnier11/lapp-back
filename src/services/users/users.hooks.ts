@@ -2,7 +2,6 @@ import * as feathersAuthentication from "@feathersjs/authentication";
 import * as local from "@feathersjs/authentication-local";
 import userValidateHook from "../../hooks/validate/user.validate.hook";
 import protectHook from "../../hooks/protect.hook";
-import userCheckRemoveHook from "../../hooks/checkRemove/user.checkRemove.hook";
 import checkUserHook from "../../hooks/checkUser.hook";
 import searchRegex from "../../hooks/searchRegex.hook";
 import {
@@ -23,7 +22,7 @@ export default {
     create: [hashPassword("password")],
     update: [hashPassword("password"), authenticate("jwt"), checkUserHook()],
     patch: [hashPassword("password"), authenticate("jwt"), checkUserHook()],
-    remove: [authenticate("jwt"), checkUserHook(), userCheckRemoveHook()]
+    remove: [authenticate("jwt"), checkUserHook()]
   },
 
   after: {

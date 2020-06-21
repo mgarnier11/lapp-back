@@ -1,19 +1,19 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { Hook, HookContext } from "@feathersjs/feathers";
-import { QuestionType } from "../../classes/questionType.class";
 import { BadRequest } from "@feathersjs/errors";
+import { QuestionTemplate } from "../../classes/questionTemplate.class";
 
 export default (options = {}): Hook => {
   return async (context: HookContext) => {
-    let questions = await context.app.service("questions").find({
+    let questions = await context.app.service("question-types").find({
       query: {
-        typeId: context.id,
-      },
+        templateId: context.id
+      }
     });
 
     if (questions.length > 0)
-      throw new BadRequest(QuestionType.Errors.QuestionsAssigned);
+      throw new BadRequest(QuestionTemplate.Errors.TypesAssigned);
 
     return context;
   };

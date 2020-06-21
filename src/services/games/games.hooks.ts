@@ -8,13 +8,13 @@ const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [/*authenticate('jwt')*/ gameValidateHook()],
+    all: [authenticate("jwt"), gameValidateHook()],
     find: [],
     get: [],
     create: [],
     update: [],
     patch: [gameCheckPatchHook()],
-    remove: [gameCheckRemoveHook()]
+    remove: [gameCheckRemoveHook()],
   },
 
   after: {
@@ -24,7 +24,7 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [],
   },
 
   error: {
@@ -34,6 +34,6 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
-  }
+    remove: [],
+  },
 };

@@ -6,14 +6,10 @@ import { BadRequest } from "@feathersjs/errors";
 
 export default (options = {}): Hook => {
   return async (context: HookContext) => {
-    let questions = await context.app.service("questions").find({
-      query: {
-        typeId: context.id,
-      },
-    });
+    let question = await context.app.service("questions").get(context.id);
 
-    if (questions.length > 0)
-      throw new BadRequest(QuestionType.Errors.QuestionsAssigned);
+    if (String(question.creator.id) !== String((context.params as any).user.id))
+      throw new BadRequest("Not authorized");
 
     return context;
   };
