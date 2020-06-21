@@ -14,7 +14,7 @@ export default {
     create: [],
     update: [],
     patch: [gameCheckPatchHook()],
-    remove: [gameCheckRemoveHook()]
+    remove: [gameCheckRemoveHook()],
   },
 
   after: {
@@ -24,7 +24,7 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [],
   },
 
   error: {
@@ -34,6 +34,6 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: []
-  }
+    remove: [],
+  },
 };

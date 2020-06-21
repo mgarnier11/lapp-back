@@ -7,6 +7,7 @@ export interface QuestionTypeModel {
   name: string;
   description: string;
   templateId: NullableId;
+  icon: string;
   hasQuestions: boolean;
 }
 
@@ -53,6 +54,14 @@ export class QuestionType {
     this._template = value;
   }
 
+  private _icon: string = "";
+  public get icon(): string {
+    return this._icon;
+  }
+  public set icon(value: string) {
+    this._icon = value;
+  }
+
   private _hasQuestions: boolean = false;
   public get hasQuestions(): boolean {
     return this._hasQuestions;
@@ -77,6 +86,7 @@ export class QuestionType {
     r.name = datas.name;
     r.description = datas.description;
     r.hasQuestions = datas.hasQuestions;
+    r.icon = datas.icon;
 
     try {
       r.template = await app.services["question-templates"].get(
@@ -98,6 +108,7 @@ export class QuestionType {
       description: questionType.description,
       hasQuestions: questionType.hasQuestions,
       templateId: questionType.template.id,
+      icon: questionType.icon,
     };
 
     return dbDatas;
@@ -108,6 +119,7 @@ export class QuestionType {
       name: datas.name,
       description: datas.description,
       hasQuestions: datas.hasQuestions,
+      icon: datas.icon,
     };
 
     if (datas.template) dbDatas.templateId = datas.template.id;
