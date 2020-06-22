@@ -8,6 +8,7 @@ import { User } from "../../classes/user.class";
 import { Role } from "../../classes/role.class";
 import { BadRequest } from "@feathersjs/errors";
 import { ObjectID } from "bson";
+import { UserConfig, UserConfigModel } from "../../classes/userConfig.class";
 
 export default (options = {}): Hook => {
   return async (context: HookContext) => {
@@ -22,7 +23,7 @@ export default (options = {}): Hook => {
       if (typeof query._id === "string") {
         query._id = new ObjectID(query._id);
       } else if (query._id.$in) {
-        query._id.$in = query._id.$in.map(id => new ObjectID(id));
+        query._id.$in = query._id.$in.map((id) => new ObjectID(id));
       }
     }
 
@@ -41,7 +42,7 @@ export default (options = {}): Hook => {
           email: oldData.email,
           password,
           gender,
-          darkMode
+          darkMode,
         });
 
         idViceUser.roleId = (
@@ -82,13 +83,11 @@ export default (options = {}): Hook => {
       if (!Validator.isInteger(oldData.gender))
         throw new BadRequest(User.Errors.gender);
 
-      if (!Validator.isBoolean(oldData.darkMode))
-        throw new BadRequest(User.Errors.darkMode);
-
       let newData = User.fromFrontToDb(oldData);
 
       if (method === "create") {
         newData.roleId = (await context.app.service("roles").getUserRole()).id;
+        newData.config = { darkMode: true, language: "en" } as UserConfigModel;
       } else {
         if (oldData.role) {
           if (!Validator.isObject(oldData.role))

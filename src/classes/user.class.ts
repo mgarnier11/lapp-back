@@ -4,6 +4,7 @@ import { AES } from "crypto-ts";
 import uuidGenerator from "uuid";
 import { NullableId, Id } from "@feathersjs/feathers";
 import app from "../app";
+import { UserConfigModel, UserConfig } from "./userConfig.class";
 
 export interface UserModel {
   _id: NullableId;
@@ -12,7 +13,7 @@ export interface UserModel {
   password: string;
   roleId: NullableId;
   gender: number;
-  darkMode: boolean;
+  config: UserConfigModel;
 }
 
 enum UserErrors {
@@ -24,7 +25,7 @@ enum UserErrors {
   roleId = "Invalid RoleId",
   gender = "Invalid Gender",
   darkMode = "Invalid DarkMode",
-  idVice = "Invalid method for ID-Vice"
+  idVice = "Invalid method for ID-Vice",
 }
 
 export class User {
@@ -78,12 +79,12 @@ export class User {
     this._gender = value;
   }
 
-  private _darkMode: boolean = false;
-  public get darkMode(): boolean {
-    return this._darkMode;
+  private _config: UserConfig = new UserConfig();
+  public get config(): UserConfig {
+    return this._config;
   }
-  public set darkMode(value: boolean) {
-    this._darkMode = value;
+  public set config(value: UserConfig) {
+    this._config = value;
   }
 
   /**
@@ -103,7 +104,7 @@ export class User {
     r.email = datas.email;
     r.gender = datas.gender;
     r.password = datas.password;
-    r.darkMode = datas.darkMode;
+    r.config = await UserConfig.fromDbToClass(datas.config);
 
     try {
       r.role = await app.services["roles"].get(datas.roleId as Id);
@@ -121,8 +122,12 @@ export class User {
       email: datas.email,
       password: datas.password,
       gender: datas.gender,
-      darkMode: datas.darkMode
     };
+
+    if (datas.config)
+      dbDatas.config = UserConfig.fromFrontToDb(
+        datas.config
+      ) as UserConfigModel;
 
     if (datas.role) dbDatas.roleId = datas.role.id;
     else if (datas.roleId) dbDatas.roleId = datas.roleId;
