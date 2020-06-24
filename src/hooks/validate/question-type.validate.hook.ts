@@ -38,6 +38,12 @@ export default (options = {}): Hook => {
         throw new BadRequest(QuestionType.Errors.template);
       }
 
+      if (!Validator.isString(oldData.icon))
+        throw new BadRequest(QuestionType.Errors.icon);
+
+      if (!Validator.isBoolean(oldData.allowParameters))
+        throw new BadRequest(QuestionType.Errors.allowParameters);
+
       let newData = QuestionType.fromFrontToDb(oldData);
 
       context.data = newData;

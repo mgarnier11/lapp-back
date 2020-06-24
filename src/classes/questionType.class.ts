@@ -8,6 +8,7 @@ export interface QuestionTypeModel {
   description: string;
   templateId: NullableId;
   icon: string;
+  allowParameters: boolean;
   hasQuestions: boolean;
 }
 
@@ -16,6 +17,8 @@ enum QuestionTypeErrors {
   name = "Invalid Name",
   description = "Invalid Description",
   template = "Invalid Template",
+  icon = "Invalid Icon",
+  allowParameters = "Invalid AllowParameters",
   QuestionsAssigned = "Questions are assigned to this type",
 }
 
@@ -62,6 +65,14 @@ export class QuestionType {
     this._icon = value;
   }
 
+  private _allowParameters: boolean = false;
+  public get allowParameters(): boolean {
+    return this._allowParameters;
+  }
+  public set allowParameters(value: boolean) {
+    this._allowParameters = value;
+  }
+
   private _hasQuestions: boolean = false;
   public get hasQuestions(): boolean {
     return this._hasQuestions;
@@ -87,6 +98,7 @@ export class QuestionType {
     r.description = datas.description;
     r.hasQuestions = datas.hasQuestions;
     r.icon = datas.icon;
+    r.allowParameters = datas.allowParameters;
 
     try {
       r.template = await app.services["question-templates"].get(
@@ -109,6 +121,7 @@ export class QuestionType {
       hasQuestions: questionType.hasQuestions,
       templateId: questionType.template.id,
       icon: questionType.icon,
+      allowParameters: questionType.allowParameters,
     };
 
     return dbDatas;
@@ -120,6 +133,7 @@ export class QuestionType {
       description: datas.description,
       hasQuestions: datas.hasQuestions,
       icon: datas.icon,
+      allowParameters: datas.allowParameters,
     };
 
     if (datas.template) dbDatas.templateId = datas.template.id;

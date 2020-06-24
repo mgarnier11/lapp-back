@@ -21,7 +21,7 @@ enum QuestionErrors {
   difficulty = "Invalid Difficulty",
   hotLevel = "Invalid HotLevel",
   type = "Invalid Type",
-  typeId = "Invalid TypeId"
+  typeId = "Invalid TypeId",
 }
 
 export class Question {
@@ -152,7 +152,7 @@ export class Question {
     let dbDatas: Partial<QuestionModel> = {
       difficulty: datas.difficulty,
       hotLevel: datas.hotLevel,
-      text: datas.text
+      text: datas.text,
     };
 
     if (datas.type) dbDatas.typeId = datas.type.id;
